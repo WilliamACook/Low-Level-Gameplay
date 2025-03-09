@@ -1,5 +1,4 @@
 #include <SFML/Graphics.hpp>
-#include <iostream>
 
 /*
     This version of the SFML "hello world" is statically linked, you may wish to try the dynamically linked version as well.
@@ -12,8 +11,11 @@ int WinMain()
 
     sf::Time lastTime = sf::Time();
     sf::Time currentTime = sf::Time();
-    int distPerSecond = 500;
+    int distPerSecond = 100;
     int timeStep = 10;  // 10 ms, 100 updates per second
+	float gravity = 10.f;
+	float groundY = 350.f;
+	sf::Vector2f velocity(0.f, 0.f);
 
     sf::Clock timer = sf::Clock ();
     timer.start();
@@ -37,6 +39,11 @@ int WinMain()
             }
 
         }
+		float deltaTime = clock.restart().asSeconds();
+		velocity.y += gravity;
+		shape.move(velocity * deltaTime);
+		if(velocity.y > 5.f)
+			velocity.y = 5.f;
 
         currentTime = timer.getElapsedTime();
         int timeDelta = (currentTime.asMilliseconds() - lastTime.asMilliseconds());
@@ -46,31 +53,20 @@ int WinMain()
             float shiftDistance = distPerSecond * timeDelta / 1000;
             //Controls
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
-            {
-                // left key is pressed: move our character
-                shape.move({ -shiftDistance, 0.f });
-            }
+				shape.move({ -shiftDistance, 0.f });
+
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
-            {
-                // left key is pressed: move our character
-                shape.move({ 1.f, 0.f });
-            }
+				shape.move({ shiftDistance, 0.f });
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
-            {
-                // left key is pressed: move our character
-                shape.move({ 0.f, -1.f });
-            }
+				shape.move({ 0.f, -shiftDistance });
+
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
-            {
-                // left key is pressed: move our character
-                shape.move({ 0.f, 1.f });
-            }
+				shape.move({ 0.f, shiftDistance });
         }
+
         window.clear();
         window.draw(shape);
         window.display();
-
-        //sf::Time elapsed = clock.restart();
 
     }
 
