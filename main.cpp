@@ -1,10 +1,15 @@
 #include <SFML/Graphics.hpp>
-#include <chrono>
+#include <iostream>
+//#include <chrono>
 
 /*
     This version of the SFML "hello world" is statically linked, you may wish to try the dynamically linked version as well.
 */
+#ifdef _CONSOLE
+int main()
+#else
 int WinMain()
+#endif
 {
     sf::RenderWindow window(sf::VideoMode({ 400, 400 }), "SFML works!");
     sf::CircleShape shape(10.f);
@@ -13,19 +18,28 @@ int WinMain()
     int distPerSecond = 100;
     int timeStep = 10;  // 10 ms, 100 updates per second
 	float groundY = 350.f;
+	bool onPlatform = false;
 
 	//CharacterTexture
 	const sf::Image character("assets/character.png");
 	sf::Texture characterText;
 	bool result = characterText.loadFromImage(character, false, sf::IntRect({ 0,0 }, { 24,24 }));
-	sf::Sprite spritey(characterText);
+	sf::Sprite player(characterText);
 	//spritey.scale(sf::Vector2(2.0f, 2.0f));
+	sf::FloatRect boundingBox = player.getGlobalBounds();
 
 	//EnemyTexture
 	const sf::Image enemy("assets/enemy.png");
 	sf::Texture enemyText;
 	bool enemyresult = enemyText.loadFromImage(enemy, false, sf::IntRect({ 0,0 }, { 24,24 }));
 	sf::Sprite sp_enemy(enemyText);
+
+	//Platform
+	const sf::Image platform("assets/platform.png");
+	sf::Texture platformText;
+	bool platformresult = platformText.loadFromImage(platform, false, sf::IntRect({ 0, 0 }, { 24, 24 }));
+	sf::Sprite sp_platform(platformText);
+	sp_platform.setPosition({ 200.f, 200.f });
 
 	sf::Time lastTime = sf::Time();
 	sf::Time currentTime = sf::Time();
@@ -63,22 +77,31 @@ int WinMain()
 				//spritey.move({ -shiftDistance, 0.f });
 
 			{
-				float x = spritey.getPosition().x - shiftDistance;
-				float y = spritey.getPosition().y;
-				if (x <  .0f) { x = 400.0f + x; }
-				spritey.setPosition(sf::Vector2f{ x,y });
+				float x = player.getPosition().x - shiftDistance;
+				float y = player.getPosition().y;
+				if (x < .0f) { x = 400.0f; }
+				player.setPosition(sf::Vector2f{ x,y });
 			}
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
-				spritey.move({ shiftDistance, 0.f });
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
+				//spritey.move({ shiftDistance, 0.f });
+			{
+				float x = player.getPosition().x + shiftDistance;
+				float y = player.getPosition().y;
+				if (x > 400.0f) { x = .0f; }
+				player.setPosition(sf::Vector2f{ x,y });
+			}
+				
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
-				spritey.move({ 0.f, -shiftDistance });
+				player.move({ 0.f, -shiftDistance });
 
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
-				spritey.move({ 0.f, shiftDistance });
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S) && !onPlatform)
+				player.move({ 0.f, shiftDistance });
 
 			//Gravity
-			spritey.move({ 0.f, 0.1f });
-			
+			if (onPlatform == false)
+			{
+				player.move({ 0.f, 0.1f });
+			}
 			//Wrap screen
 			if (sp_enemy.getPosition().x > 400.f)
 			{			
@@ -88,6 +111,24 @@ int WinMain()
 			{
 				sp_enemy.move({ 1.f, 0.f });
 			}
+	
+			if (player.getGlobalBounds().findIntersection(sp_enemy.getGlobalBounds()))
+			{
+				std::cout << "Collision " << sp_enemy.getPosition().x<<":"<<sp_enemy.getPosition().y << std::endl;;
+				
+			}
+			if (player.getGlobalBounds().findIntersection(sp_platform.getGlobalBounds()))
+			{
+				std::cout << "Collision with platform" << std::endl;;
+
+				//onPlatform == true; // Does the onPlatform variable have the value true? result: no
+				onPlatform = true; // onPlatform is set to the value of true;
+			}
+			else
+			{
+				onPlatform = false;
+			}
+
 
 			/*if (spritey.getPosition().x > 400.f && transitioned == false)
 			{
@@ -110,8 +151,9 @@ int WinMain()
 
         window.clear();
         //window.draw(shape);
-		window.draw(spritey);
+		window.draw(player);
 		window.draw(sp_enemy);
+		window.draw(sp_platform);
         window.display();
 
     }
