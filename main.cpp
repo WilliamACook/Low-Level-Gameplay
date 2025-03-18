@@ -5,6 +5,7 @@
 /*
     This version of the SFML "hello world" is statically linked, you may wish to try the dynamically linked version as well.
 */
+
 #ifdef _CONSOLE
 int main()
 #else
@@ -48,7 +49,8 @@ int WinMain()
 	lastTime = timer.getElapsedTime();
 
 	bool transitioned = false;
-
+	bool CheckCollision();
+	
     while (window.isOpen())
     {
         // Event polling section of code - this must be done in the thread which created the window
@@ -116,20 +118,34 @@ int WinMain()
 			{
 				std::cout << "Collision " << sp_enemy.getPosition().x<<":"<<sp_enemy.getPosition().y << std::endl;;
 				
+				
 			}
 			if (player.getGlobalBounds().findIntersection(sp_platform.getGlobalBounds()))
 			{
-				std::cout << "Collision with platform" << std::endl;;
-
+				//std::cout << "Collision with platform" << std::endl;;
+				if (player.getPosition().x <= sp_platform.getPosition().x)
+				{
+					std::cout << "right" << std::endl;
+				}
+				if (player.getPosition().x >= sp_platform.getPosition().y)
+				{
+					std::cout << "left" << std::endl;
+				}
+				/*if (player.getPosition().y <= sp_platform.getPosition().y)
+				{
+					std::cout << "Top" << std::endl;;
+				}*/
 				//onPlatform == true; // Does the onPlatform variable have the value true? result: no
+			 
 				onPlatform = true; // onPlatform is set to the value of true;
 			}
 			else
 			{
 				onPlatform = false;
 			}
+			
 
-
+			
 			/*if (spritey.getPosition().x > 400.f && transitioned == false)
 			{
 				transitioned = true;
