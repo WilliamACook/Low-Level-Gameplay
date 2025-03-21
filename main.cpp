@@ -49,8 +49,13 @@ int WinMain()
 	lastTime = timer.getElapsedTime();
 
 	bool transitioned = false;
-	bool CheckCollision();
+
+	//int checkCollision(sf::Sprite & player, sf::Sprite & platform) {
+	//	//float closestX = clamp(player.getPosition().x);
+	//	return;
+	//}
 	
+
     while (window.isOpen())
     {
         // Event polling section of code - this must be done in the thread which created the window
@@ -74,6 +79,14 @@ int WinMain()
         {
             lastTime = currentTime;
             float shiftDistance = distPerSecond * timeDelta / 1000;
+			sf::FloatRect newposition = player.getGlobalBounds();
+
+			// TODO:
+			// Instead of moving the player straight away, manipulate newposition
+			// check newposition instead of player, use it like a view into a future potential movement.
+			// If it's colliding, discard the newposition and do not move
+			// otherwise, overwrite the globalbounds of the rect with the newposition.
+
             //Controls
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
 				//spritey.move({ -shiftDistance, 0.f });
@@ -113,8 +126,10 @@ int WinMain()
 			{
 				sp_enemy.move({ 1.f, 0.f });
 			}
-	
-			if (player.getGlobalBounds().findIntersection(sp_enemy.getGlobalBounds()))
+
+			
+			//Collision
+			if (newposition.findIntersection(sp_enemy.getGlobalBounds()))
 			{
 				std::cout << "Collision " << sp_enemy.getPosition().x<<":"<<sp_enemy.getPosition().y << std::endl;;
 				
@@ -122,19 +137,19 @@ int WinMain()
 			}
 			if (player.getGlobalBounds().findIntersection(sp_platform.getGlobalBounds()))
 			{
+				float distanceX = player.getPosition().x - sp_platform.getPosition().x;
+				float distanceY = player.getPosition().y - sp_platform.getPosition().y;
+
+				float distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
 				//std::cout << "Collision with platform" << std::endl;;
 				if (player.getPosition().x <= sp_platform.getPosition().x)
 				{
-					std::cout << "right" << std::endl;
+					std::cout << "Left" << std::endl;
 				}
 				if (player.getPosition().x >= sp_platform.getPosition().y)
 				{
-					std::cout << "left" << std::endl;
+					std::cout << "Right" << std::endl;
 				}
-				/*if (player.getPosition().y <= sp_platform.getPosition().y)
-				{
-					std::cout << "Top" << std::endl;;
-				}*/
 				//onPlatform == true; // Does the onPlatform variable have the value true? result: no
 			 
 				onPlatform = true; // onPlatform is set to the value of true;
