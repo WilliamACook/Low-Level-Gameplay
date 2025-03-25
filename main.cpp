@@ -127,27 +127,34 @@ int WinMain()
 				sp_enemy.move({ 1.f, 0.f });
 			}
 
-			// Get positions and sizes
 			sf::Vector2f platformPos = sp_platform.getPosition();
-			sf::Vector2f platformSize(24.f, 24.f);  
+			sf::Vector2f platformSize(24.f, 24.f);  // Assuming platform's size is 24x24
 			sf::Vector2f playerPos = player.getPosition();
-			sf::Vector2f playerSize(24.f, 24.f);  
+			sf::Vector2f playerSize(24.f, 24.f);  // Assuming player's size is 24x24
 
 			// Debugging output
 			std::cout << "Player Position: " << playerPos.x << ", " << playerPos.y << std::endl;
 			std::cout << "Platform Position: " << platformPos.x << ", " << platformPos.y << std::endl;
 
-			// Check if the player is falling and is above the platform
-			if (playerPos.y + playerSize.y <= platformPos.y &&  
-				playerPos.x + playerSize.x > platformPos.x &&   
-				playerPos.x < platformPos.x + platformSize.x && 
-				playerPos.y + playerSize.y + 0.1f >= platformPos.y) { 
+			// Check if the player is falling and is above the platform (top collision)
+			if (playerPos.y + playerSize.y <= platformPos.y && // Player's bottom is above platform's top
+				playerPos.x + playerSize.x > platformPos.x &&  // Player is horizontally overlapping platform
+				playerPos.x < platformPos.x + platformSize.x && // Player is within platform's x bounds
+				playerPos.y + playerSize.y + 0.3f >= platformPos.y) { // Player is just about to land
 
-				player.setPosition(sf::Vector2f(playerPos.x, platformPos.y - playerSize.y));  
-				onPlatform = true;  
+				// Snap the player to the platform's top (stop downward movement)
+				player.setPosition(sf::Vector2f(playerPos.x, platformPos.y - playerSize.y));  // Snap on top of platform
+				onPlatform = true;  // The player is now on the platform
+			}
+			else if (playerPos.y + playerSize.y > platformPos.y + platformSize.y && // If the player is below the platform (bottom collision)
+				playerPos.x + playerSize.x > platformPos.x &&  // Player is horizontally overlapping platform
+				playerPos.x < platformPos.x + platformSize.x) { // Player is within platform's x bounds
+
+				// Prevent the player from moving up through the platform if they are already below
+				player.setPosition(sf::Vector2f(playerPos.x, platformPos.y + platformSize.y)); // Stop at platform's bottom
 			}
 			else {
-				onPlatform = false;
+				onPlatform = false;  // The player is not on the platform
 			}
 
 			// Handle horizontal collisions (left and right)
