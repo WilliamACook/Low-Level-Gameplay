@@ -127,37 +127,74 @@ int WinMain()
 				sp_enemy.move({ 1.f, 0.f });
 			}
 
-			
-			//Collision
-			if (newposition.findIntersection(sp_enemy.getGlobalBounds()))
-			{
-				std::cout << "Collision " << sp_enemy.getPosition().x<<":"<<sp_enemy.getPosition().y << std::endl;;
-				
-				
-			}
-			if (player.getGlobalBounds().findIntersection(sp_platform.getGlobalBounds()))
-			{
-				float distanceX = player.getPosition().x - sp_platform.getPosition().x;
-				float distanceY = player.getPosition().y - sp_platform.getPosition().y;
+			// Get positions and sizes
+			sf::Vector2f platformPos = sp_platform.getPosition();
+			sf::Vector2f platformSize(24.f, 24.f);  
+			sf::Vector2f playerPos = player.getPosition();
+			sf::Vector2f playerSize(24.f, 24.f);  
 
-				float distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
-				//std::cout << "Collision with platform" << std::endl;;
-				if (player.getPosition().x <= sp_platform.getPosition().x)
-				{
-					std::cout << "Left" << std::endl;
-				}
-				if (player.getPosition().x >= sp_platform.getPosition().y)
-				{
-					std::cout << "Right" << std::endl;
-				}
-				//onPlatform == true; // Does the onPlatform variable have the value true? result: no
-			 
-				onPlatform = true; // onPlatform is set to the value of true;
+			// Debugging output
+			std::cout << "Player Position: " << playerPos.x << ", " << playerPos.y << std::endl;
+			std::cout << "Platform Position: " << platformPos.x << ", " << platformPos.y << std::endl;
+
+			// Check if the player is falling and is above the platform
+			if (playerPos.y + playerSize.y <= platformPos.y &&  
+				playerPos.x + playerSize.x > platformPos.x &&   
+				playerPos.x < platformPos.x + platformSize.x && 
+				playerPos.y + playerSize.y + 0.1f >= platformPos.y) { 
+
+				player.setPosition(sf::Vector2f(playerPos.x, platformPos.y - playerSize.y));  
+				onPlatform = true;  
 			}
-			else
-			{
+			else {
 				onPlatform = false;
 			}
+
+			// Handle horizontal collisions (left and right)
+			if (playerPos.x + playerSize.x > platformPos.x && playerPos.x < platformPos.x + platformSize.x) {
+				// Check for side collisions and prevent movement through platform
+				if (playerPos.y + playerSize.y > platformPos.y && playerPos.y < platformPos.y + platformSize.y) {
+					// Horizontal collision, stop moving in that direction
+					// This ensures the player cannot move through the platform horizontally
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+						player.setPosition(sf::Vector2(playerPos.x + shiftDistance, playerPos.y));  // Prevent moving through platform from the left
+					}
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+						player.setPosition(sf::Vector2(playerPos.x - shiftDistance, playerPos.y));  // Prevent moving through platform from the right
+					}
+				}
+			}
+
+			////Collision
+			//if (newposition.findIntersection(sp_enemy.getGlobalBounds()))
+			//{
+			//	std::cout << "Collision " << sp_enemy.getPosition().x<<":"<<sp_enemy.getPosition().y << std::endl;;
+			//	
+			//	
+			//}
+			//if (player.getGlobalBounds().findIntersection(sp_platform.getGlobalBounds()))
+			//{
+			//	float distanceX = player.getPosition().x - sp_platform.getPosition().x;
+			//	float distanceY = player.getPosition().y - sp_platform.getPosition().y;
+
+			//	float distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
+			//	//std::cout << "Collision with platform" << std::endl;;
+			//	if (player.getPosition().x <= sp_platform.getPosition().x)
+			//	{
+			//		std::cout << "Left" << std::endl;
+			//	}
+			//	if (player.getPosition().x >= sp_platform.getPosition().y)
+			//	{
+			//		std::cout << "Right" << std::endl;
+			//	}
+			//	//onPlatform == true; // Does the onPlatform variable have the value true? result: no
+			// 
+			//	onPlatform = true; // onPlatform is set to the value of true;
+			//}
+			//else
+			//{
+			//	onPlatform = false;
+			//}
 			
 
 			
