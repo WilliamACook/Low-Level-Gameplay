@@ -106,11 +106,19 @@ int WinMain()
 				player.setPosition(sf::Vector2f{ x,y });
 			}
 				
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
-				player.move({ 0.f, -shiftDistance });
-
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S) && !onPlatform)
-				player.move({ 0.f, shiftDistance });
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
+			{
+				float x = player.getPosition().x;
+				float y = player.getPosition().y - shiftDistance;
+				player.setPosition(sf::Vector2f{ x,y });
+			}
+				
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S) && !onPlatform)
+			{
+				float x = player.getPosition().x;
+				float y = player.getPosition().y + shiftDistance;
+				player.setPosition(sf::Vector2f{ x,y });
+			}				
 
 			//Gravity
 			if (onPlatform == false)
@@ -128,45 +136,55 @@ int WinMain()
 			}
 
 			sf::Vector2f platformPos = sp_platform.getPosition();
-			sf::Vector2f platformSize(24.f, 24.f);  // Assuming platform's size is 24x24
+			sf::Vector2f platformSize(24.f, 24.f);
 			sf::Vector2f playerPos = player.getPosition();
-			sf::Vector2f playerSize(24.f, 24.f);  // Assuming player's size is 24x24
+			sf::Vector2f playerSize(24.f, 24.f);
 
 			// Debugging output
-			std::cout << "Player Position: " << playerPos.x << ", " << playerPos.y << std::endl;
-			std::cout << "Platform Position: " << platformPos.x << ", " << platformPos.y << std::endl;
+			//std::cout << "Player Position: " << playerPos.x << ", " << playerPos.y << std::endl;
+			//std::cout << "Platform Position: " << platformPos.x << ", " << platformPos.y << std::endl;
 
-			// Check if the player is falling and is above the platform (top collision)
-			if (playerPos.y + playerSize.y <= platformPos.y && // Player's bottom is above platform's top
+			//top collision
+			if (playerPos.y + playerSize.y <= platformPos.y &&
+				playerPos.y < platformPos.y + playerSize.y && // Player's bottom is above platform's top
 				playerPos.x + playerSize.x > platformPos.x &&  // Player is horizontally overlapping platform
-				playerPos.x < platformPos.x + platformSize.x && // Player is within platform's x bounds
-				playerPos.y + playerSize.y + 0.3f >= platformPos.y) { // Player is just about to land
-
-				// Snap the player to the platform's top (stop downward movement)
-				player.setPosition(sf::Vector2f(playerPos.x, platformPos.y - playerSize.y));  // Snap on top of platform
+				playerPos.x < platformPos.x + platformSize.x )
+			{ 
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
+				{
+					player.setPosition(sf::Vector2f(playerPos.x, platformPos.y - playerSize.y));
+				}
 				onPlatform = true;  // The player is now on the platform
 			}
 			else if (playerPos.y + playerSize.y > platformPos.y + platformSize.y && // If the player is below the platform (bottom collision)
 				playerPos.x + playerSize.x > platformPos.x &&  // Player is horizontally overlapping platform
-				playerPos.x < platformPos.x + platformSize.x) { // Player is within platform's x bounds
+				playerPos.x < platformPos.x + platformSize.x) 
+			{ 
 
 				// Prevent the player from moving up through the platform if they are already below
-				player.setPosition(sf::Vector2f(playerPos.x, platformPos.y + platformSize.y)); // Stop at platform's bottom
+				 // Stop at platform's bottom
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
+				{
+					player.setPosition(sf::Vector2f(playerPos.x, platformPos.y + platformSize.y));
+				}
 			}
-			else {
+			else 
+			{
 				onPlatform = false;  // The player is not on the platform
-			}
+			}	
 
-			// Handle horizontal collisions (left and right)
-			if (playerPos.x + playerSize.x > platformPos.x && playerPos.x < platformPos.x + platformSize.x) {
+			// left and right collisions 
+			if (playerPos.x + playerSize.x > platformPos.x && playerPos.x < platformPos.x + platformSize.x) 
+			{
 				// Check for side collisions and prevent movement through platform
-				if (playerPos.y + playerSize.y > platformPos.y && playerPos.y < platformPos.y + platformSize.y) {
-					// Horizontal collision, stop moving in that direction
-					// This ensures the player cannot move through the platform horizontally
-					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+				if (playerPos.y + playerSize.y > platformPos.y && playerPos.y < platformPos.y + platformSize.y) 
+				{
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) 
+					{
 						player.setPosition(sf::Vector2(playerPos.x + shiftDistance, playerPos.y));  // Prevent moving through platform from the left
 					}
-					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) 
+					{
 						player.setPosition(sf::Vector2(playerPos.x - shiftDistance, playerPos.y));  // Prevent moving through platform from the right
 					}
 				}
@@ -181,20 +199,20 @@ int WinMain()
 			//}
 			//if (player.getGlobalBounds().findIntersection(sp_platform.getGlobalBounds()))
 			//{
-			//	float distanceX = player.getPosition().x - sp_platform.getPosition().x;
+			//	/*float distanceX = player.getPosition().x - sp_platform.getPosition().x;
 			//	float distanceY = player.getPosition().y - sp_platform.getPosition().y;
 
-			//	float distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
-			//	//std::cout << "Collision with platform" << std::endl;;
-			//	if (player.getPosition().x <= sp_platform.getPosition().x)
+			//	float distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);*/
+			//	std::cout << "Collision with platform" << std::endl;;
+			//	/*if (player.getPosition().x <= sp_platform.getPosition().x)
 			//	{
 			//		std::cout << "Left" << std::endl;
 			//	}
 			//	if (player.getPosition().x >= sp_platform.getPosition().y)
 			//	{
 			//		std::cout << "Right" << std::endl;
-			//	}
-			//	//onPlatform == true; // Does the onPlatform variable have the value true? result: no
+			//	}*/
+			//	onPlatform == true; // Does the onPlatform variable have the value true? result: no
 			// 
 			//	onPlatform = true; // onPlatform is set to the value of true;
 			//}
