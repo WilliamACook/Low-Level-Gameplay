@@ -136,9 +136,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="collision.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="player.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="collision.h" />
     <ClInclude Include="packages\SFML\include\SFML\Audio.hpp" />
     <ClInclude Include="packages\SFML\include\SFML\Audio\AudioResource.hpp" />
     <ClInclude Include="packages\SFML\include\SFML\Audio\Export.hpp" />
@@ -240,6 +243,7 @@
     <ClInclude Include="packages\SFML\include\SFML\Window\WindowBase.hpp" />
     <ClInclude Include="packages\SFML\include\SFML\Window\WindowEnums.hpp" />
     <ClInclude Include="packages\SFML\include\SFML\Window\WindowHandle.hpp" />
+    <ClInclude Include="player.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages\SFML\include\SFML\Audio\SoundFileFactory.inl" />

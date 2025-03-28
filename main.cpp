@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include "player.hpp"
 //#include <chrono>
 
 /*
@@ -16,10 +17,7 @@ int WinMain()
     sf::CircleShape shape(10.f);
     shape.setFillColor(sf::Color::Green);
     
-    int distPerSecond = 100;
-    int timeStep = 10;  // 10 ms, 100 updates per second
-	float groundY = 350.f;
-	bool onPlatform = false;
+	Player player;
 
 	//CharacterTexture
 	const sf::Image character("assets/character.png");
@@ -27,7 +25,7 @@ int WinMain()
 	bool result = characterText.loadFromImage(character, false, sf::IntRect({ 0,0 }, { 24,24 }));
 	sf::Sprite player(characterText);
 	//spritey.scale(sf::Vector2(2.0f, 2.0f));
-	sf::FloatRect boundingBox = player.getGlobalBounds();
+	//sf::FloatRect boundingBox = player.getGlobalBounds();
 
 	//EnemyTexture
 	const sf::Image enemy("assets/enemy.png");
@@ -45,6 +43,7 @@ int WinMain()
 	sf::Time lastTime = sf::Time();
 	sf::Time currentTime = sf::Time();
 	sf::Clock timer = sf::Clock();
+	int timeStep = 10;  // 10 ms, 100 updates per second
 	timer.start();
 	lastTime = timer.getElapsedTime();
 
@@ -78,8 +77,16 @@ int WinMain()
         if (timeDelta > timeStep)
         {
             lastTime = currentTime;
-            float shiftDistance = distPerSecond * timeDelta / 1000;
-			sf::FloatRect newposition = player.getGlobalBounds();
+			//Wrap screen
+			if (sp_enemy.getPosition().x > 400.f)
+			{
+				sp_enemy.setPosition({ -10, 0 });
+			}
+			else
+			{
+				sp_enemy.move({ 1.f, 0.f });
+			}
+			
 
 			// TODO:
 			// Instead of moving the player straight away, manipulate newposition
@@ -87,53 +94,7 @@ int WinMain()
 			// If it's colliding, discard the newposition and do not move
 			// otherwise, overwrite the globalbounds of the rect with the newposition.
 
-            //Controls
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
-				//spritey.move({ -shiftDistance, 0.f });
-
-			{
-				float x = player.getPosition().x - shiftDistance;
-				float y = player.getPosition().y;
-				if (x < .0f) { x = 400.0f; }
-				player.setPosition(sf::Vector2f{ x,y });
-			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
-				//spritey.move({ shiftDistance, 0.f });
-			{
-				float x = player.getPosition().x + shiftDistance;
-				float y = player.getPosition().y;
-				if (x > 400.0f) { x = .0f; }
-				player.setPosition(sf::Vector2f{ x,y });
-			}
-				
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
-			{
-				float x = player.getPosition().x;
-				float y = player.getPosition().y - shiftDistance;
-				player.setPosition(sf::Vector2f{ x,y });
-			}
-				
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S) && !onPlatform)
-			{
-				float x = player.getPosition().x;
-				float y = player.getPosition().y + shiftDistance;
-				player.setPosition(sf::Vector2f{ x,y });
-			}				
-
-			//Gravity
-			if (onPlatform == false)
-			{
-				player.move({ 0.f, 0.1f });
-			}
-			//Wrap screen
-			if (sp_enemy.getPosition().x > 400.f)
-			{			
-				sp_enemy.setPosition({-10, 0});
-			}
-			else
-			{
-				sp_enemy.move({ 1.f, 0.f });
-			}
+			player.Update();
 
 			sf::Vector2f platformPos = sp_platform.getPosition();
 			sf::Vector2f platformSize(24.f, 24.f);
@@ -153,35 +114,34 @@ int WinMain()
 				onPlatform = true;
 			}
 			//Bottom Collision
-			if (playerPos.y < platformPos.y + platformSize.y &&          // Player's top is above platform's bottom
-				playerPos.y + 5.f > platformPos.y + platformSize.y &&    // Player is just about to hit the bottom of the platform
-				playerPos.x + playerSize.x > platformPos.x &&            // Player horizontally overlaps platform
-				playerPos.x < platformPos.x + platformSize.x)            // Player horizontally overlaps platform
+			if (playerPos.y < platformPos.y + platformSize.y &&
+				playerPos.y + 5.f > platformPos.y + platformSize.y &&
+				playerPos.x + playerSize.x > platformPos.x &&
+				playerPos.x < platformPos.x + platformSize.x)
 			{
 				// Snap the player to the bottom of the platform
 				player.setPosition(sf::Vector2(playerPos.x, platformPos.y + platformSize.y));
 			}
 			//Left Collision
-			if (!onPlatform &&                                           // Only check if the player is not standing on the platform
-				playerPos.x + playerSize.x > platformPos.x &&            // Player's right side is beyond platform's left side
-				playerPos.x + playerSize.x - 5.f <= platformPos.x &&     // Player is just about to hit the left side
-				playerPos.y + playerSize.y > platformPos.y &&            // Player vertically overlaps platform
-				playerPos.y < platformPos.y + platformSize.y)            // Player vertically overlaps platform
+			if (!onPlatform &&
+				playerPos.x + playerSize.x > platformPos.x &&
+				playerPos.x + playerSize.x - 5.f <= platformPos.x &&
+				playerPos.y + playerSize.y > platformPos.y &&
+				playerPos.y < platformPos.y + platformSize.y)
 			{
 				// Snap the player to the left of the platform
 				player.setPosition(sf::Vector2(platformPos.x - playerSize.x, playerPos.y));
 			}
 			//Right Collision
-			if (!onPlatform &&                                           // Only check if the player is not standing on the platform
-				playerPos.x < platformPos.x + platformSize.x &&          // Player's left side is beyond platform's right side
-				playerPos.x + 5.f > platformPos.x + platformSize.x &&    // Player is just about to hit the right side
-				playerPos.y + playerSize.y > platformPos.y &&            // Player vertically overlaps platform
-				playerPos.y < platformPos.y + platformSize.y)            // Player vertically overlaps platform
+			if (!onPlatform &&
+				playerPos.x < platformPos.x + platformSize.x &&
+				playerPos.x + 5.f > platformPos.x + platformSize.x &&
+				playerPos.y + playerSize.y > platformPos.y &&
+				playerPos.y < platformPos.y + platformSize.y)
 			{
 				// Snap the player to the right of the platform
 				player.setPosition(sf::Vector2(platformPos.x + platformSize.x, playerPos.y));
 			}
-
 
 			////Collision
 			//if (newposition.findIntersection(sp_enemy.getGlobalBounds()))
