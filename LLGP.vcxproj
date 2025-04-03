@@ -112,7 +112,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)/packages/SFML/lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);sfml-graphics-s-d.lib;sfml-window-s-d.lib;sfml-system-s-d.lib;sfml-network-s-d.lib;sfml-audio-s-d.lib;opengl32.lib;gdi32.lib;flacd.lib;vorbisencd.lib;vorbisfiled.lib;vorbisd.lib;oggd.lib;ws2_32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);sfml-graphics-s-d.lib;sfml-window-s-d.lib;sfml-system-s-d.lib;sfml-network-s-d.lib;sfml-audio-s-d.lib;opengl32.lib;gdi32.lib;flacd.lib;vorbisencd.lib;vorbisfiled.lib;vorbisd.lib;oggd.lib;ws2_32.lib;winmm.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -136,10 +136,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GameStateManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="player.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GameStateManager.h" />
     <ClInclude Include="packages\SFML\include\SFML\Audio.hpp" />
     <ClInclude Include="packages\SFML\include\SFML\Audio\AudioResource.hpp" />
     <ClInclude Include="packages\SFML\include\SFML\Audio\Export.hpp" />

@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include "player.h"
+#include "GameStateManager.h"
 //#include <chrono>
 
 /*
@@ -15,6 +16,7 @@ int WinMain()
 {
     sf::RenderWindow window(sf::VideoMode({ 400, 400 }), "SFML works!");
     int timeStep = 6;  // 10 ms, 100 updates per second
+	GameStateManager gameState;
 
 	//Player
 	const sf::Image playerTexture("assets/character.png");
@@ -90,6 +92,8 @@ int WinMain()
         {
             lastTime = currentTime;
 			player.update();
+			gameState.handleInput(window);
+			
 			player.handleCollision(platforms);
 			// TODO:
 			// Instead of moving the player straight away, manipulate newposition
@@ -138,14 +142,26 @@ int WinMain()
 			//	onPlatform = false;
 			//}			
         }
-        window.clear();
-		window.draw(sp_enemy);
-		window.draw(sp_platform);
-		window.draw(sp_platform1);
-		window.draw(sp_platform2);
-		window.draw(sp_floor);
-		player.draw(window);
-        window.display();
+        
+		if (gameState.getState() == GameState::Playing)
+		{
+			window.clear();
+			window.draw(sp_enemy);
+			window.draw(sp_platform);
+			window.draw(sp_platform1);
+			window.draw(sp_platform2);
+			window.draw(sp_floor);
+			player.draw(window);
+			window.display();
+		}
+		else
+		{
+			window.clear();
+			gameState.draw(window);
+			window.display();
+		}
+		
+        
     }
 
     
