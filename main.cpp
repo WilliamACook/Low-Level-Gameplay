@@ -82,34 +82,39 @@ int WinMain()
                     window.close();
             }
 			//std::cout << "Drawing player at: " << player.getPosition().x << ", " << player.getPosition().y << std::endl;
-			
-
         }
 
         currentTime = timer.getElapsedTime();
         int timeDelta = (currentTime.asMilliseconds() - lastTime.asMilliseconds());
         if (timeDelta > timeStep)
         {
-            lastTime = currentTime;
-			player.update();
+			lastTime = currentTime;
+			if (gameState.getState() == GameState::Playing)
+			{
+				player.update();
+				player.handleCollision(platforms);
+
+				//Wrap screen
+				if (sp_enemy.getPosition().x > 400.f)
+				{
+					sp_enemy.setPosition({ -10, 0 });
+				}
+				else
+				{
+					sp_enemy.move({ 1.f, 0.f });
+				}
+			}
+
 			gameState.handleInput(window);
 			
-			player.handleCollision(platforms);
+			
 			// TODO:
 			// Instead of moving the player straight away, manipulate newposition
 			// check newposition instead of player, use it like a view into a future potential movement.
 			// If it's colliding, discard the newposition and do not move
 			// otherwise, overwrite the globalbounds of the rect with the newposition.
 
-			//Wrap screen
-			if (sp_enemy.getPosition().x > 400.f)
-			{			
-				sp_enemy.setPosition({-10, 0});
-			}
-			else
-			{
-				sp_enemy.move({ 1.f, 0.f });
-			}
+		
 
 			////Collision
 			//if (newposition.findIntersection(sp_enemy.getGlobalBounds()))

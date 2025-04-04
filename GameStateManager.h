@@ -8,8 +8,10 @@ class GameStateManager
 private:
 	GameState currentState;
 	sf::Font font;
-	sf::Text title, playButton, optionsButton, exitButton;
+	sf::Font titleFont;
+	sf::Text title, playButton, optionsButton, exitButton, paused;
 	sf::RectangleShape playButtonBox;
+	sf::RectangleShape exitButtonBox;
 
 public:
 	GameStateManager();
