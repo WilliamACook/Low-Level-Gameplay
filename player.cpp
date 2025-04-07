@@ -116,3 +116,14 @@ void player::handleCollision(const std::vector<sf::Sprite>& platform)
 		}
 	}
 }
+
+sf::Vector2f player::getSize() const
+{
+	return sf::Vector2f(sprite.getTexture().getSize());
+}
+
+void player::reset()
+{
+	std::cout << "Resetting player position..." << std::endl;
+	sprite.setPosition(sf::Vector2f(200.f, 180.f));
+}

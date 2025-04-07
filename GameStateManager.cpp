@@ -70,6 +70,7 @@ void GameStateManager::handleInput(sf::RenderWindow& window)
 		playButtonBox.setPosition(sf::Vector2f(123.f, 148.f));
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 		{
+			restartGame();
 			currentState = GameState::Playing;
 		}
 	}
@@ -79,6 +80,7 @@ void GameStateManager::draw(sf::RenderWindow& window)
 {
 	if (currentState == GameState::MainMenu)
 	{
+		window.clear();
 		window.draw(title);
 		window.draw(playButtonBox);
 		window.draw(playButton);
@@ -95,4 +97,21 @@ void GameStateManager::draw(sf::RenderWindow& window)
 		window.draw(playButton);
 		window.draw(exitButton);
 	}
+
+	if (currentState == GameState::GameOver)
+	{
+		window.clear();
+		playButton.setString("Restart");
+		playButton.setPosition(sf::Vector2f(150.f, 150.f));
+		title.setString("Game Over");
+		title.setPosition(sf::Vector2f(60.f, 50.f));
+		window.draw(title);
+		window.draw(playButton);
+	}
+	
+}
+
+void GameStateManager::restartGame()
+{
+	//std::cout << "Player position after reset: " << player.getPosition().x << std::endl;
 }

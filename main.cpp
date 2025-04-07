@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include "player.h"
+#include "Enemy.h"
 #include "GameStateManager.h"
 //#include <chrono>
 
@@ -20,13 +21,12 @@ int WinMain()
 
 	//Player
 	const sf::Image playerTexture("assets/character.png");
-	player player(0, 0, playerTexture);
+	player player(200, 180, playerTexture);
 
-	//EnemyTexture
-	const sf::Image enemy("assets/enemy.png");
-	sf::Texture enemyText;
-	bool enemyresult = enemyText.loadFromImage(enemy, false, sf::IntRect({ 0,0 }, { 24,24 }));
-	sf::Sprite sp_enemy(enemyText);
+	//Enemy
+	std::vector<Enemy> enemies;
+	const sf::Image enemyTexture("assets/enemy.png");
+	enemies.emplace_back(enemyTexture, sf::Vector2f(0, 0));
 
 	//Platform
 	const sf::Image platform("assets/platform.png");
@@ -93,20 +93,44 @@ int WinMain()
 			{
 				player.update();
 				player.handleCollision(platforms);
-
-				//Wrap screen
-				if (sp_enemy.getPosition().x > 400.f)
+				for (auto& enemy : enemies) 
 				{
-					sp_enemy.setPosition({ -10, 0 });
+					enemy.update();
 				}
-				else
+
+				sf::Vector2f playerPos = player.getPosition();
+				sf::Vector2f playerSize = player.getSize();
+
+				for (auto it = enemies.begin(); it != enemies.end(); )
 				{
-					sp_enemy.move({ 1.f, 0.f });
+					sf::Vector2f enemyPos = it->getPosition();
+					sf::Vector2f enemySize = it->getSize();
+					float enemyMiddleY = enemyPos.y + enemySize.y / 2.f;
+
+
+					bool collisionX = playerPos.x + playerSize.x > enemyPos.x && playerPos.x < enemyPos.x + enemySize.x;
+					bool collisionY = playerPos.y + playerSize.y > enemyPos.y && playerPos.y < enemyPos.y + enemySize.y;
+
+					if (collisionX && collisionY)
+					{
+						if (playerPos.y + playerSize.y >= enemyMiddleY - 10.f && playerPos.y + playerSize.y <= enemyPos.y + enemySize.y)
+						{
+							std::cout << "Enemy Die " << std::endl;
+							it = enemies.erase(it);
+							continue;
+						}
+						else
+						{
+							std::cout << "Player Die " << std::endl;
+							player.reset();
+							gameState.setState(GameState::GameOver);
+						}
+					}
+					++it;
 				}
 			}
 
 			gameState.handleInput(window);
-			
 			
 			// TODO:
 			// Instead of moving the player straight away, manipulate newposition
@@ -151,7 +175,11 @@ int WinMain()
 		if (gameState.getState() == GameState::Playing)
 		{
 			window.clear();
-			window.draw(sp_enemy);
+			//window.draw(sp_enemy);
+			for (auto& enemy : enemies)
+			{
+				enemy.draw(window);
+			}
 			window.draw(sp_platform);
 			window.draw(sp_platform1);
 			window.draw(sp_platform2);

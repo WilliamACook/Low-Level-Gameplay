@@ -7,7 +7,6 @@ private:
 	sf::Image image;
 	sf::Texture texture;
 	sf::Sprite sprite;
-	sf::Vector2f velocity;
 	bool onPlatform;
 public:
 	player(float x, float y, const sf::Image texturesrc);
@@ -21,5 +20,7 @@ public:
 	void setPosition(float x, float y);
 
 	void handleCollision(const std::vector<sf::Sprite>& platform);
+	sf::Vector2f getSize() const;
+	void reset();
 };
 

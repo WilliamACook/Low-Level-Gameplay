@@ -19,8 +19,9 @@ public:
 	void handleInput(sf::RenderWindow& window);
 	void update();
 	void draw(sf::RenderWindow& window);
+	void restartGame();
 
 	GameState getState() const { return currentState; }
-	void seteState(GameState state) { currentState = state; }
+	void setState(GameState state) { currentState = state; }
 };
 
