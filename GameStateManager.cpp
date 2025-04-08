@@ -1,7 +1,8 @@
 #include "GameStateManager.h"
 #include <iostream>
+#include "player.h"
 
-GameStateManager::GameStateManager() : title(font), playButton(font), optionsButton(font), exitButton(font), paused(font)
+GameStateManager::GameStateManager() : title(font), playButton(font), optionsButton(font), exitButton(font), paused(font), lives(font)
 {
 	if (!font.openFromFile("assets/Roboto.ttf"))
 		std::cout << "Failed to load font!" << std::endl;
@@ -107,6 +108,15 @@ void GameStateManager::draw(sf::RenderWindow& window)
 		title.setPosition(sf::Vector2f(60.f, 50.f));
 		window.draw(title);
 		window.draw(playButton);
+	}
+
+	if (currentState == GameState::Playing)
+	{
+		window.clear();
+		lives.setFont(font);
+		lives.setString("Lives: ");
+		lives.setPosition(sf::Vector2f(20.f, 20.f));
+		window.draw(lives);
 	}
 	
 }

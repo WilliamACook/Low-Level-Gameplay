@@ -12,7 +12,7 @@ player::player(float x, float y, const sf::Image texturesrc) : texture(), sprite
 	onPlatform = false;
 }
 
-void player::update()
+void player::update(sf::RenderWindow & window)
 {
 	sf::Vector2f playerPos = sprite.getPosition();
 	onPlatform = false;
@@ -43,6 +43,25 @@ void player::update()
 		float x = sprite.getPosition().x;
 		float y = sprite.getPosition().y + moveSpeed;
 		sprite.setPosition(sf::Vector2f{ x,y });
+	}
+	float const top = window.getSize().y;
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
+	{
+		if (!just_jumped)
+		{
+			float const projected_height = sprite.getPosition().y - 20.f;
+
+			if (projected_height < top)
+			{
+				sprite.setPosition(sf::Vector2f(sprite.getPosition().x, projected_height));
+			}
+
+			just_jumped = true;
+		}
+	}
+	else
+	{
+		just_jumped = false;
 	}
 
 	//Gravity

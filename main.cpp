@@ -5,10 +5,6 @@
 #include "GameStateManager.h"
 //#include <chrono>
 
-/*
-    This version of the SFML "hello world" is statically linked, you may wish to try the dynamically linked version as well.
-*/
-
 #ifdef _CONSOLE
 int main()
 #else
@@ -18,6 +14,7 @@ int WinMain()
     sf::RenderWindow window(sf::VideoMode({ 400, 400 }), "SFML works!");
     int timeStep = 6;  // 10 ms, 100 updates per second
 	GameStateManager gameState;
+	
 
 	//Player
 	const sf::Image playerTexture("assets/character.png");
@@ -91,7 +88,7 @@ int WinMain()
 			lastTime = currentTime;
 			if (gameState.getState() == GameState::Playing)
 			{
-				player.update();
+				player.update(window);
 				player.handleCollision(platforms);
 				for (auto& enemy : enemies) 
 				{
@@ -123,7 +120,11 @@ int WinMain()
 						{
 							std::cout << "Player Die " << std::endl;
 							player.reset();
-							gameState.setState(GameState::GameOver);
+							player.loseLife();
+							if (player.getLives() == 0)
+							{
+								gameState.setState(GameState::GameOver);
+							}	
 						}
 					}
 					++it;
@@ -175,6 +176,7 @@ int WinMain()
 		if (gameState.getState() == GameState::Playing)
 		{
 			window.clear();
+			gameState.draw(window);
 			//window.draw(sp_enemy);
 			for (auto& enemy : enemies)
 			{
@@ -192,10 +194,6 @@ int WinMain()
 			window.clear();
 			gameState.draw(window);
 			window.display();
-		}
-		
-        
-    }
-
-    
+		}	     
+    } 
 }

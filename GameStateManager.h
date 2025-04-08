@@ -9,7 +9,7 @@ private:
 	GameState currentState;
 	sf::Font font;
 	sf::Font titleFont;
-	sf::Text title, playButton, optionsButton, exitButton, paused;
+	sf::Text title, playButton, optionsButton, exitButton, paused, lives;
 	sf::RectangleShape playButtonBox;
 	sf::RectangleShape exitButtonBox;
 
