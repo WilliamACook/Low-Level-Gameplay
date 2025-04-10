@@ -14,7 +14,7 @@ private:
 public:
 	player(float x, float y, const sf::Image texturesrc);
 
-	void update(sf::RenderWindow& window);
+	void update(sf::RenderWindow& window, const std::vector<sf::Sprite>& platforms);
 
 	bool draw(sf::RenderWindow& window);
 

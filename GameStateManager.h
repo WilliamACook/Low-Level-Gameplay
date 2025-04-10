@@ -3,6 +3,8 @@
 
 enum class GameState { MainMenu, Playing, Paused, GameOver};
 
+class player;
+
 class GameStateManager
 {
 private:
@@ -12,12 +14,13 @@ private:
 	sf::Text title, playButton, optionsButton, exitButton, paused, lives;
 	sf::RectangleShape playButtonBox;
 	sf::RectangleShape exitButtonBox;
+	player* playerRef = nullptr;
 
 public:
 	GameStateManager();
 
 	void handleInput(sf::RenderWindow& window);
-	void update();
+	void setPlayerReference(player* p);
 	void draw(sf::RenderWindow& window);
 	void restartGame();
 

@@ -12,7 +12,7 @@ player::player(float x, float y, const sf::Image texturesrc) : texture(), sprite
 	onPlatform = false;
 }
 
-void player::update(sf::RenderWindow & window)
+void player::update(sf::RenderWindow & window, const std::vector<sf::Sprite>& platforms)
 {
 	sf::Vector2f playerPos = sprite.getPosition();
 	onPlatform = false;
@@ -44,18 +44,36 @@ void player::update(sf::RenderWindow & window)
 		float y = sprite.getPosition().y + moveSpeed;
 		sprite.setPosition(sf::Vector2f{ x,y });
 	}
-	float const top = window.getSize().y;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
 	{
 		if (!just_jumped)
 		{
-			float const projected_height = sprite.getPosition().y - 20.f;
-
-			if (projected_height < top)
+			sf::Vector2f playerPos = sprite.getPosition();
+			sf::Vector2f playerSize(24.f, 24.f);
+			float projected_height = sprite.getPosition().y - 20.f;
+			bool collidesWithPlatform = false;
+			for (const auto& platform : platforms)
 			{
+				sf::Vector2f platformPos = platform.getPosition();
+				sf::Vector2 platformSize = platform.getTexture().getSize();
+
+				bool collisionX = playerPos.x + playerSize.x > platformPos.x && playerPos.x < platformPos.x + platformSize.x;
+				bool collisionY = projected_height + playerSize.y > platformPos.y && projected_height < platformPos.y + platformSize.y;
+
+				if (collisionX && collisionY)
+				{
+					collidesWithPlatform = true;
+					break;
+				}
+			}
+			if (!collidesWithPlatform)
+			{
+				if (projected_height < 0)
+				{
+					projected_height = 0;
+				}
 				sprite.setPosition(sf::Vector2f(sprite.getPosition().x, projected_height));
 			}
-
 			just_jumped = true;
 		}
 	}
@@ -93,7 +111,8 @@ void player::handleCollision(const std::vector<sf::Sprite>& platform)
 	sf::Vector2f playerPos = sprite.getPosition();
 	sf::Vector2f playerSize(24.f, 24.f);
 
-	for (const auto& plat : platform) {
+	for (const auto& plat : platform) 
+	{
 		sf::Vector2f platformPos = plat.getPosition();
 		sf::Vector2 platformSize = plat.getTexture().getSize();
 

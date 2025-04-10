@@ -77,6 +77,11 @@ void GameStateManager::handleInput(sf::RenderWindow& window)
 	}
 }
 
+void GameStateManager::setPlayerReference(player* p)
+{
+	playerRef = p;
+}
+
 void GameStateManager::draw(sf::RenderWindow& window)
 {
 	if (currentState == GameState::MainMenu)
@@ -114,7 +119,7 @@ void GameStateManager::draw(sf::RenderWindow& window)
 	{
 		window.clear();
 		lives.setFont(font);
-		lives.setString("Lives: ");
+		lives.setString("Lives: " + std::to_string(playerRef->getLives()));
 		lives.setPosition(sf::Vector2f(20.f, 20.f));
 		window.draw(lives);
 	}
