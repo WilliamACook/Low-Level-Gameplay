@@ -24,6 +24,7 @@ public:
 
 	int getLives() const { return lives; }
 	void loseLife() { lives--; }
+	void setLifes(int numberOfLives) {lives = numberOfLives;}
 
 	void handleCollision(const std::vector<sf::Sprite>& platform);
 	sf::Vector2f getSize() const;

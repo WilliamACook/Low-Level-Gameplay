@@ -57,7 +57,6 @@ void GameStateManager::handleInput(sf::RenderWindow& window)
 			currentState = GameState::Paused;
 		}
 	}
-	
 
 	playButton.setFillColor(sf::Color::White);
 	playButtonBox.setSize(sf::Vector2f(150.f, 40.f));
@@ -72,6 +71,7 @@ void GameStateManager::handleInput(sf::RenderWindow& window)
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 		{
 			restartGame();
+			playerRef->setLifes(3);
 			currentState = GameState::Playing;
 		}
 	}
