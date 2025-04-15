@@ -62,17 +62,20 @@ void GameStateManager::handleInput(sf::RenderWindow& window)
 	playButtonBox.setSize(sf::Vector2f(150.f, 40.f));
 	playButtonBox.setPosition(sf::Vector2f(125.f, 150.f));
 	sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-	if (playButtonBox.getGlobalBounds().contains(mousePos))
+	if (currentState != GameState::Playing)
 	{
-		//playButtonBox.setFillColor(sf::Color::Cyan);
-		playButton.setFillColor(sf::Color::Red);
-		playButtonBox.setSize(sf::Vector2f(154.f, 44.f));
-		playButtonBox.setPosition(sf::Vector2f(123.f, 148.f));
-		if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+		if (playButtonBox.getGlobalBounds().contains(mousePos))
 		{
-			restartGame();
-			playerRef->setLifes(3);
-			currentState = GameState::Playing;
+			//playButtonBox.setFillColor(sf::Color::Cyan);
+			playButton.setFillColor(sf::Color::Red);
+			playButtonBox.setSize(sf::Vector2f(154.f, 44.f));
+			playButtonBox.setPosition(sf::Vector2f(123.f, 148.f));
+			if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+			{
+				restartGame();
+				playerRef->setLifes(3);
+				currentState = GameState::Playing;
+			}
 		}
 	}
 }

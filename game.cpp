@@ -1,7 +1,7 @@
 #include "game.h"
 #include <iostream>
 
-game::game() : window(sf::VideoMode({400, 400}), "Joust"), timeStep(6), player(200.f, 180.f, sf::Image("assets/character.png")), sp_platform(platformText), sp_platform1(platformText1), sp_platform2(platformText2), sp_floor(floorText)
+game::game() : window(sf::VideoMode({400, 400}), "Joust"), timeStep(6), player(200.f, 160.f, sf::Image("assets/idle.png")), sp_platform(platformText), sp_platform1(platformText1), sp_platform2(platformText2), sp_floor(floorText)
 {
 	lastTime = timer.getElapsedTime();
 	loadAssets();
