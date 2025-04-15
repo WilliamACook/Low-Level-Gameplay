@@ -20,26 +20,31 @@ void player::update(sf::RenderWindow & window, const std::vector<sf::Sprite>& pl
 	onPlatform = false;
 	isMoving = false;
 	float moveSpeed = 1.f;
-
+	
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
 	{
 		sprite.setOrigin(sf::Vector2(sprite.getLocalBounds().size.x, 0.f));
 		sprite.setScale(sf::Vector2f( - 1.f, 1.f));
 		isMoving = true;
-		float x = sprite.getPosition().x - moveSpeed;
+		velocity.x -= acceleration;
+		if (velocity.x < -maxSpeed) velocity.x = -maxSpeed; 
+		
+		//float x = sprite.getPosition().x - moveSpeed;
 		float y = sprite.getPosition().y;
-		if (x < .0f) { x = 400.0f; }
-		sprite.setPosition(sf::Vector2f{ x,y });
+		if (playerPos.x < 0.f) playerPos.x = 400.f;
+			sprite.setPosition(sf::Vector2f{ playerPos.x,y });
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
 	{
 		sprite.setOrigin(sf::Vector2(0.f, 0.f));
 		sprite.setScale(sf::Vector2f(1.f, 1.f));
 		isMoving = true;
-		float x = sprite.getPosition().x + moveSpeed;
+		velocity.x += acceleration;
+		if (velocity.x > maxSpeed) velocity.x = maxSpeed;
+		//float x = sprite.getPosition().x + moveSpeed;
 		float y = sprite.getPosition().y;
-		if (x > 400.0f) { x = .0f; }
-		sprite.setPosition(sf::Vector2f{ x,y });
+		if (playerPos.x > 400.0f) playerPos.x = .0f; 
+		sprite.setPosition(sf::Vector2f{ playerPos.x,y });
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
 	{
@@ -90,28 +95,73 @@ void player::update(sf::RenderWindow & window, const std::vector<sf::Sprite>& pl
 	{
 		just_jumped = false;
 	}
-
+	
+	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A) && (!sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)))
+	{
+		if (velocity.x > 0)
+		{
+			velocity.x -= deceleration;
+			if (velocity.x < 0) velocity.x = 0;
+		}
+		else if (velocity.x < 0)
+		{
+			velocity.x += deceleration;
+			if (velocity.x > 0) velocity.x = 0;
+		}
+	}
+	sprite.move(sf::Vector2(velocity.x, 0.f));
 	//Gravity
 	if (onPlatform == false)
 	{
 	 sprite.move({ 0.f, 0.3f });
 	}
 
+	handleCollision(platforms);
+
 	//Animation States
-	PlayerState newState = isMoving ? PlayerState::Walking : PlayerState::Idle;
+	PlayerState newState;
+	if (!onPlatform)
+	{
+		newState = PlayerState::Flying;
+	}
+	else if (!isMoving && std::abs(velocity.x) > 0.1f)
+	{
+		newState = PlayerState::Slowing;
+	}
+	else if (isMoving)
+	{
+		newState = PlayerState::Walking;
+	}
+	else
+	{
+		newState = PlayerState::Idle;
+	}
+
+	//Sets current state once instead of setting it every update, fixes issue sprite being invisible
 	if (newState != currentState)
 	{
 		currentState = newState;
-
-		if (currentState == PlayerState::Idle)
+		
+		switch (currentState)
 		{
+		case PlayerState::Idle:
 			sprite.setTexture(idleTexture);
-			sprite.setTextureRect(sf::IntRect({ 0,0 }, { 31,41 }));
-		}
-		else if (currentState == PlayerState::Walking)
-		{
+			sprite.setTextureRect(sf::IntRect({ 0, 0 }, { 31, 41 }));
+			break;
+		case PlayerState::Slowing:
+			sprite.setTexture(slowTexture);
+			sprite.setTextureRect(sf::IntRect({ 0, 0 }, { 31, 38 }));
+			break;
+
+		case PlayerState::Walking:
 			sprite.setTexture(walkingTexture);
 			sprite.setTextureRect(walkingFrames[currentWalkingFrame]);
+			break;
+
+		case PlayerState::Flying:
+			sprite.setTexture(flyingTexture);
+			sprite.setTextureRect(flyingFrames[currentFlyingFrame]);
+			break;
 		}
 	}
 	updateAnimation();
@@ -129,12 +179,21 @@ void player::loadAnimation()
 	const sf::Image walkingImage("assets/walkingSpritesheet.png");
 	bool walkingResult = walkingTexture.loadFromImage(walkingImage, false, sf::IntRect({ 0, 0 }, { 93, 41 }));
 
+	const sf::Image slowingImage("assets/slowing.png");
+	bool slowingResult = slowTexture.loadFromImage(slowingImage, false, sf::IntRect({ 0, 0 }, { 31, 38 }));
+
 	const sf::Image idleImage("assets/idle.png");
-	bool result = idleTexture.loadFromImage(idleImage, false, sf::IntRect({ 0, 0 }, { 31, 41 }));
+	bool idleResult = idleTexture.loadFromImage(idleImage, false, sf::IntRect({ 0, 0 }, { 31, 41 }));
 
 	walkingFrames.push_back(sf::IntRect({ 0,0 }, { 31, 41 }));
 	walkingFrames.push_back(sf::IntRect({ 31,0 }, { 31, 41 }));
 	walkingFrames.push_back(sf::IntRect({ 62,0 }, { 31, 41 }));
+
+	const sf::Image flyingImage("assets/flyingSpritesheet.png");
+	bool flyingResult = flyingTexture.loadFromImage(flyingImage, false, sf::IntRect({ 0, 0 }, { 64, 28 }));
+
+	flyingFrames.push_back(sf::IntRect({ 0,0 }, { 32, 28 }));
+	flyingFrames.push_back(sf::IntRect({ 32,0 }, { 32, 28 }));
 }
 
 void player::updateAnimation()
@@ -146,9 +205,16 @@ void player::updateAnimation()
 	case PlayerState::Walking:
 		if (animationClock.getElapsedTime().asSeconds() > frameTime)
 		{
-			sprite.setTexture(walkingTexture);
 			currentWalkingFrame = (currentWalkingFrame + 1) % walkingFrames.size();
 			sprite.setTextureRect(walkingFrames[currentWalkingFrame]);
+			animationClock.restart();
+		}
+		break;
+	case PlayerState::Flying:
+		if (animationClock.getElapsedTime().asSeconds() > frameTime)
+		{
+			currentFlyingFrame = (currentFlyingFrame + 1) % flyingFrames.size();
+			sprite.setTextureRect(flyingFrames[currentFlyingFrame]);
 			animationClock.restart();
 		}
 		break;
@@ -184,6 +250,7 @@ void player::handleCollision(const std::vector<sf::Sprite>& platform)
 			// Snap the player to the top of the platform
 			sprite.setPosition(sf::Vector2(playerPos.x, platformPos.y - playerSize.y));
 			onPlatform = true;
+			//std::cout << "Onplatform " << std::endl;
 		}
 		//Bottom Collision
 		if (playerPos.y < platformPos.y + platformSize.y &&          

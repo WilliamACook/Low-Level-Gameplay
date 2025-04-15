@@ -61,7 +61,6 @@ void game::run()
 			if (gameState.getState() == GameState::Playing)
 			{
 				player.update(window, platforms);
-				player.handleCollision(platforms);
 				for (auto& enemy : enemies)
 				{
 					enemy.update();

@@ -15,6 +15,11 @@ private:
 	bool just_jumped = true;
 	bool isMoving;
 
+	sf::Vector2f velocity;
+	float acceleration = 0.02f;
+	float deceleration = 0.01f;
+	float maxSpeed = 1.f;
+
 	sf::Texture walkingTexture;
 	std::vector<sf::IntRect> walkingFrames;
 	int currentWalkingFrame = 0;
