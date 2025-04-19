@@ -30,10 +30,12 @@ void game::loadAssets()
 	sp_platform2.setPosition({ 350.f, 130.f });
 	platforms.push_back(sp_platform2);
 
-	const sf::Image floor("assets/floor.png");
-	bool floorresult = floorText.loadFromImage(floor, false, sf::IntRect({ 0, 0 }, { 372, 4 }));
+	const sf::Image floor("assets/floorPlatform.png");
+	bool floorresult = floorText.loadFromImage(floor, false, sf::IntRect({ 0, 0 }, { 149, 30 }));
 	sf::Sprite sp_floor(floorText);
-	sp_floor.setPosition({ 16.f,380.f });
+	sp_floor.setScale(sf::Vector2f(2.f, 2.f));
+	sp_floor.setPosition({ 51.f,340.f });
+	//sp_floor.setOrigin(sf::Vector2f(sp_floor.getGlobalBounds().size.x / 2.f, sp_floor.getGlobalBounds().size.y / 2.f));	
 	platforms.push_back(sp_floor);
 }
 
