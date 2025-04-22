@@ -15,6 +15,8 @@ private:
 	sf::RectangleShape playButtonBox;
 	sf::RectangleShape exitButtonBox;
 	player* playerRef = nullptr;
+	sf::Texture logoText;
+	sf::Sprite sp_Logo;
 
 public:
 	GameStateManager();

@@ -1,7 +1,7 @@
 #include "game.h"
 #include <iostream>
 
-game::game() : window(sf::VideoMode({400, 400}), "Joust"), timeStep(6), player(200.f, 160.f, sf::Image("assets/idle.png")), sp_platform(platformText), sp_platform1(platformText1), sp_platform2(platformText2), sp_floor(floorText)
+game::game() : window(sf::VideoMode({400, 400}), "Joust"), timeStep(6), player(200.f, 160.f, sf::Image("assets/idle.png")), platformText(), platformText1(), platformText2(), floorText()
 {
 	lastTime = timer.getElapsedTime();
 	loadAssets();
@@ -35,7 +35,6 @@ void game::loadAssets()
 	sf::Sprite sp_floor(floorText);
 	sp_floor.setScale(sf::Vector2f(2.f, 2.f));
 	sp_floor.setPosition({ 51.f,340.f });
-	//sp_floor.setOrigin(sf::Vector2f(sp_floor.getGlobalBounds().size.x / 2.f, sp_floor.getGlobalBounds().size.y / 2.f));	
 	platforms.push_back(sp_floor);
 }
 

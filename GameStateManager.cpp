@@ -2,7 +2,7 @@
 #include <iostream>
 #include "player.h"
 
-GameStateManager::GameStateManager() : title(font), playButton(font), optionsButton(font), exitButton(font), paused(font), lives(font)
+GameStateManager::GameStateManager() : title(font), playButton(font), optionsButton(font), exitButton(font), paused(font), lives(font), sp_Logo(logoText)
 {
 	if (!font.openFromFile("assets/Roboto.ttf"))
 		std::cout << "Failed to load font!" << std::endl;
@@ -37,6 +37,13 @@ GameStateManager::GameStateManager() : title(font), playButton(font), optionsBut
 	playButtonBox.setOutlineColor(sf::Color::White);
 
 	exitButtonBox.setSize(sf::Vector2f(150.f, 40.f));
+
+	const sf::Image joustLogo("assets/joustLogo.png");
+	bool logoResult = logoText.loadFromImage(joustLogo, false, sf::IntRect({ 0, 0 }, { 170, 40 }));
+	sf::Sprite temp(logoText);
+	sp_Logo = temp;
+	sp_Logo.setScale(sf::Vector2f(2.f, 2.f));
+	sp_Logo.setPosition({ 30.f, 30.f });
 
 	currentState = GameState::MainMenu;
 }
@@ -90,11 +97,10 @@ void GameStateManager::draw(sf::RenderWindow& window)
 	if (currentState == GameState::MainMenu)
 	{
 		window.clear();
-		window.draw(title);
+		window.draw(sp_Logo);
 		window.draw(playButtonBox);
 		window.draw(playButton);
 		window.draw(exitButton);
-		
 	}
 
 	if (currentState == GameState::Paused)
