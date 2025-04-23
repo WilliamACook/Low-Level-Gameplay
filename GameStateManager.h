@@ -12,11 +12,13 @@ private:
 	sf::Font font;
 	sf::Font titleFont;
 	sf::Text title, playButton, optionsButton, exitButton, paused, lives;
-	sf::RectangleShape playButtonBox;
-	sf::RectangleShape exitButtonBox;
 	player* playerRef = nullptr;
 	sf::Texture logoText;
 	sf::Sprite sp_Logo;
+	sf::Texture buttonOffText;
+	sf::Texture buttonOnText;
+	sf::Sprite sp_PlayButton;
+	sf::Sprite sp_QuitButton;
 
 public:
 	GameStateManager();

@@ -2,7 +2,7 @@
 #include <iostream>
 #include "player.h"
 
-GameStateManager::GameStateManager() : title(font), playButton(font), optionsButton(font), exitButton(font), paused(font), lives(font), sp_Logo(logoText)
+GameStateManager::GameStateManager() : title(font), playButton(font), optionsButton(font), exitButton(font), paused(font), lives(font), sp_Logo(logoText), sp_PlayButton(buttonOffText), sp_QuitButton(buttonOffText)
 {
 	if (!font.openFromFile("assets/Roboto.ttf"))
 		std::cout << "Failed to load font!" << std::endl;
@@ -18,33 +18,40 @@ GameStateManager::GameStateManager() : title(font), playButton(font), optionsBut
 	playButton.setFont(font);
 	playButton.setString("Play");
 	playButton.setCharacterSize(30);
-	playButton.setPosition(sf::Vector2f(175.f, 150.f));
+	playButton.setOutlineColor(sf::Color::Black);
+	playButton.setOutlineThickness(2.f);
+	playButton.setPosition(sf::Vector2f(170.f, 155.f));
+	
 
 	exitButton.setFont(font);
 	exitButton.setString("Quit");
 	exitButton.setCharacterSize(30);
-	exitButton.setPosition(sf::Vector2f(175.f, 250.f));
+	exitButton.setOutlineColor(sf::Color::Black);
+	exitButton.setOutlineThickness(2.f);
+	exitButton.setPosition(sf::Vector2f(170.f, 250.f));
 
 	paused.setFont(titleFont);
 	paused.setString("Paused");
 	paused.setCharacterSize(50);
-	paused.setPosition(sf::Vector2f(125.f, 50.f));
-
-	playButtonBox.setSize(sf::Vector2f(150.f, 40.f));
-	playButtonBox.setPosition(sf::Vector2f(125.f, 150.f));
-	playButtonBox.setFillColor(sf::Color::Blue);
-	playButtonBox.setOutlineThickness(2.f);
-	playButtonBox.setOutlineColor(sf::Color::White);
-
-	exitButtonBox.setSize(sf::Vector2f(150.f, 40.f));
+	paused.setPosition(sf::Vector2f(100.f, 50.f));
 
 	const sf::Image joustLogo("assets/joustLogo.png");
 	bool logoResult = logoText.loadFromImage(joustLogo, false, sf::IntRect({ 0, 0 }, { 170, 40 }));
-	sf::Sprite temp(logoText);
-	sp_Logo = temp;
+	sf::Sprite logoTemp(logoText);
+	sp_Logo = logoTemp;
 	sp_Logo.setScale(sf::Vector2f(2.f, 2.f));
 	sp_Logo.setPosition({ 30.f, 30.f });
 
+	const sf::Image buttonOff("assets/button_Off.png");
+	bool buttonResult = buttonOffText.loadFromImage(buttonOff, false, sf::IntRect({ 0, 0 }, { 512, 256 }));
+	sf::Sprite buttonTemp(buttonOffText);
+	sp_PlayButton = buttonTemp;
+	sp_PlayButton.setScale(sf::Vector2f(0.3f, 0.2f));
+	sp_PlayButton.setPosition(sf::Vector2f(123.f, 150.f));
+
+	sp_QuitButton = buttonTemp;
+	sp_QuitButton.setScale(sf::Vector2f(0.3f, 0.2f));
+	sp_QuitButton.setPosition(sf::Vector2f(123.f, 245.f));
 	currentState = GameState::MainMenu;
 }
 
@@ -65,23 +72,32 @@ void GameStateManager::handleInput(sf::RenderWindow& window)
 		}
 	}
 
-	playButton.setFillColor(sf::Color::White);
-	playButtonBox.setSize(sf::Vector2f(150.f, 40.f));
-	playButtonBox.setPosition(sf::Vector2f(125.f, 150.f));
+	sp_PlayButton.setScale(sf::Vector2f(0.3f, 0.2f));
+	sp_PlayButton.setPosition(sf::Vector2f(123.f, 150.f));
+	sp_QuitButton.setScale(sf::Vector2f(0.3f, 0.2f));
+	sp_QuitButton.setPosition(sf::Vector2f(123.f, 245.f));
 	sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 	if (currentState != GameState::Playing)
 	{
-		if (playButtonBox.getGlobalBounds().contains(mousePos))
+		if (sp_PlayButton.getGlobalBounds().contains(mousePos))
 		{
-			//playButtonBox.setFillColor(sf::Color::Cyan);
-			playButton.setFillColor(sf::Color::Red);
-			playButtonBox.setSize(sf::Vector2f(154.f, 44.f));
-			playButtonBox.setPosition(sf::Vector2f(123.f, 148.f));
+			sp_PlayButton.setScale(sf::Vector2f(0.33f, 0.22f));
+			sp_PlayButton.setPosition(sf::Vector2f(115.5f, 148.f));
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 			{
 				restartGame();
 				playerRef->setLifes(3);
 				currentState = GameState::Playing;
+			}
+		}
+
+		if (sp_QuitButton.getGlobalBounds().contains(mousePos))
+		{
+			sp_QuitButton.setScale(sf::Vector2f(0.33f, 0.22f));
+			sp_QuitButton.setPosition(sf::Vector2f(115.5f, 243.f));
+			if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+			{
+				window.close();
 			}
 		}
 	}
@@ -96,19 +112,20 @@ void GameStateManager::draw(sf::RenderWindow& window)
 {
 	if (currentState == GameState::MainMenu)
 	{
-		window.clear();
 		window.draw(sp_Logo);
-		window.draw(playButtonBox);
+		window.draw(sp_PlayButton);
 		window.draw(playButton);
+		window.draw(sp_QuitButton);
 		window.draw(exitButton);
 	}
 
 	if (currentState == GameState::Paused)
 	{
 		playButton.setString("Resume");
-		playButton.setPosition(sf::Vector2f(150.f, 150.f));
+		playButton.setPosition(sf::Vector2f(145.f, 155.f));
 		window.draw(paused);
-		window.draw(playButtonBox);
+		window.draw(sp_PlayButton);
+		window.draw(sp_QuitButton);
 		window.draw(playButton);
 		window.draw(exitButton);
 	}

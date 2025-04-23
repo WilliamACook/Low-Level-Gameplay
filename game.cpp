@@ -1,7 +1,7 @@
 #include "game.h"
 #include <iostream>
 
-game::game() : window(sf::VideoMode({400, 400}), "Joust"), timeStep(6), player(200.f, 160.f, sf::Image("assets/idle.png")), platformText(), platformText1(), platformText2(), floorText()
+game::game() : window(sf::VideoMode({400, 400}), "Joust"), timeStep(6), player(200.f, 160.f, sf::Image("assets/idle.png")), platformText(), platformText1(), platformText2(), floorText(), floor(floorText)
 {
 	lastTime = timer.getElapsedTime();
 	loadAssets();
@@ -30,12 +30,14 @@ void game::loadAssets()
 	sp_platform2.setPosition({ 350.f, 130.f });
 	platforms.push_back(sp_platform2);
 
-	const sf::Image floor("assets/floorPlatform.png");
-	bool floorresult = floorText.loadFromImage(floor, false, sf::IntRect({ 0, 0 }, { 149, 30 }));
+	const sf::Image floorImage("assets/floorPlatform.png");
+	bool floorresult = floorText.loadFromImage(floorImage, false, sf::IntRect({ 0, 0 }, { 149, 30 }));
 	sf::Sprite sp_floor(floorText);
 	sp_floor.setScale(sf::Vector2f(2.f, 2.f));
 	sp_floor.setPosition({ 51.f,340.f });
 	platforms.push_back(sp_floor);
+
+	floor = sp_floor;
 }
 
 void game::run()
@@ -129,9 +131,26 @@ void game::run()
 			player.draw(window);
 			window.display();
 		}
+		else if (gameState.getState() == GameState::Paused)
+		{
+			window.clear();
+			for (auto& enemy : enemies)
+			{
+				enemy.draw(window);
+			}
+
+			for (auto& platform : platforms)
+			{
+				window.draw(platform);
+			}
+			player.draw(window);
+			gameState.draw(window);
+			window.display();
+		}
 		else
 		{
 			window.clear();
+			window.draw(floor);
 			gameState.draw(window);
 			window.display();
 		}

@@ -20,6 +20,7 @@ private:
 	std::vector<sf::Sprite> platforms;
 
 	sf::Texture platformText, platformText1, platformText2, floorText;
+	sf::Sprite floor;
 
 	void loadAssets();
 
