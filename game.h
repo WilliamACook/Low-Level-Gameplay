@@ -19,7 +19,7 @@ private:
 	std::vector<Enemy> enemies;
 	std::vector<sf::Sprite> platforms;
 
-	sf::Texture platformText, platformText1, platformText2, floorText;
+	sf::Texture platformText, platformText1, platformText2, platformText3, platformText4, floorText;
 	sf::Sprite floor;
 
 	void loadAssets();

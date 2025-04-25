@@ -31,7 +31,7 @@ void player::update(sf::RenderWindow & window, const std::vector<sf::Sprite>& pl
 		
 		//float x = sprite.getPosition().x - moveSpeed;
 		float y = sprite.getPosition().y;
-		if (playerPos.x < 0.f) playerPos.x = 400.f;
+		if (playerPos.x < 0.f) playerPos.x = 533.f;
 			sprite.setPosition(sf::Vector2f{ playerPos.x,y });
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
@@ -43,7 +43,7 @@ void player::update(sf::RenderWindow & window, const std::vector<sf::Sprite>& pl
 		if (velocity.x > maxSpeed) velocity.x = maxSpeed;
 		//float x = sprite.getPosition().x + moveSpeed;
 		float y = sprite.getPosition().y;
-		if (playerPos.x > 400.0f) playerPos.x = .0f; 
+		if (playerPos.x > 533.0f) playerPos.x = .0f; 
 		sprite.setPosition(sf::Vector2f{ playerPos.x,y });
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))

@@ -1,21 +1,33 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
+enum class flapDirection {None, Up, Down};
+
 class Enemy
 {
 private:
 	sf::Image image;
 	sf::Texture texture;
 	sf::Sprite sprite;
+	bool onPlatform;
+	sf::Vector2f velocity;
+
+	sf::Clock flapClock;
+	float flapCooldown = 0.f;
+	float strength = 0.2;
+	float bottomThreshhold = 320.f;
+	float middleThreshhold = 200.f;
+	float topThreshhold = 80.f;
+	flapDirection currentState = flapDirection::None;
 
 public:
 	Enemy(sf::Image texturesrc, sf::Vector2f position);
 
-	void update();
+	void update(const std::vector<sf::Sprite>& platforms);
 	void draw(sf::RenderWindow& window);
 	void bounce();
+	void handleCollision(const std::vector<sf::Sprite>& platforms);
 	sf::Vector2f getPosition() const;
 	void setPosition(sf::Vector2f pos);
 	sf::Vector2f getSize() const;
 };
-

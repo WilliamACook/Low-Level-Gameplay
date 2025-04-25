@@ -1,7 +1,7 @@
 #include "game.h"
 #include <iostream>
 
-game::game() : window(sf::VideoMode({400, 400}), "Joust"), timeStep(6), player(200.f, 160.f, sf::Image("assets/idle.png")), platformText(), platformText1(), platformText2(), floorText(), floor(floorText)
+game::game() : window(sf::VideoMode({533, 400}), "Joust"), timeStep(6), player(235.f, 300.f, sf::Image("assets/idle.png")), platformText(), platformText1(), platformText2(), platformText3(), platformText4(), floorText(), floor(floorText)
 {
 	lastTime = timer.getElapsedTime();
 	loadAssets();
@@ -12,29 +12,41 @@ game::game() : window(sf::VideoMode({400, 400}), "Joust"), timeStep(6), player(2
 
 void game::loadAssets()
 {
-	const sf::Image platform("assets/platform.png");
+	/*const sf::Image platform("assets/platform.png");
 	bool platformresult = platformText.loadFromImage(platform, false, sf::IntRect({ 0, 0 }, { 24, 24 }));
 	sf::Sprite sp_platform(platformText);
 	sp_platform.setPosition({ 200.f, 200.f });
-	platforms.push_back(sp_platform);
+	platforms.push_back(sp_platform);*/
 
 	const sf::Image platform1("assets/platform1.png");
 	bool platformresult1 = platformText1.loadFromImage(platform1, false, sf::IntRect({ 0, 0 }, { 176, 18 }));
 	sf::Sprite sp_platform1(platformText1);
-	sp_platform1.setPosition({ 120.f, 60.f });
+	sp_platform1.setPosition({ 146.f, 100.f });
 	platforms.push_back(sp_platform1);
 
 	const sf::Image platform2("assets/platform2.png");
 	bool platformresult2 = platformText2.loadFromImage(platform2, false, sf::IntRect({ 0, 0 }, { 128, 16 }));
 	sf::Sprite sp_platform2(platformText2);	
-	sp_platform2.setPosition({ 350.f, 130.f });
+	sp_platform2.setPosition({ 483.f, 200.f });
 	platforms.push_back(sp_platform2);
+
+	const sf::Image platform3("assets/platform3.png");
+	bool platformresult3 = platformText3.loadFromImage(platform3, false, sf::IntRect({ 0, 0 }, { 128, 16 }));
+	sf::Sprite sp_platform3(platformText3);
+	sp_platform3.setPosition({ 370.f, 185.f });
+	platforms.push_back(sp_platform3);
+
+	const sf::Image platform4("assets/platform4.png");
+	bool platformresult4 = platformText4.loadFromImage(platform4, false, sf::IntRect({ 0, 0 }, { 128, 16 }));
+	sf::Sprite sp_platform4(platformText4);
+	sp_platform4.setPosition({ 10.f, 200.f });
+	platforms.push_back(sp_platform4);
 
 	const sf::Image floorImage("assets/floorPlatform.png");
 	bool floorresult = floorText.loadFromImage(floorImage, false, sf::IntRect({ 0, 0 }, { 149, 30 }));
 	sf::Sprite sp_floor(floorText);
 	sp_floor.setScale(sf::Vector2f(2.f, 2.f));
-	sp_floor.setPosition({ 51.f,340.f });
+	sp_floor.setPosition({ 120.f,340.f });
 	platforms.push_back(sp_floor);
 
 	floor = sp_floor;
@@ -57,8 +69,8 @@ void game::run()
 		}
 
 		currentTime = timer.getElapsedTime();
-		int timeDelta = (currentTime.asMilliseconds() - lastTime.asMilliseconds());
-		if (timeDelta > timeStep)
+		int deltaTime = (currentTime.asMilliseconds() - lastTime.asMilliseconds());
+		if (deltaTime > timeStep)
 		{
 			lastTime = currentTime;
 			if (gameState.getState() == GameState::Playing)
@@ -66,7 +78,7 @@ void game::run()
 				player.update(window, platforms);
 				for (auto& enemy : enemies)
 				{
-					enemy.update();
+					enemy.update(platforms);
 				}
 
 				sf::Vector2f playerPos = player.getPosition();
