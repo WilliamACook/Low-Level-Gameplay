@@ -1,23 +1,17 @@
 #include "game.h"
 #include <iostream>
 
-game::game() : window(sf::VideoMode({533, 400}), "Joust"), timeStep(6), player(235.f, 300.f, sf::Image("assets/idle.png")), platformText(), platformText1(), platformText2(), platformText3(), platformText4(), floorText(), floor(floorText)
+game::game() : window(sf::VideoMode({533, 400}), "Joust"), timeStep(6), player(235.f, 300.f, sf::Image("assets/idle.png")), platformText(), 
+platformText1(), platformText2(), platformText3(), platformText4(), floorText(), floor(floorText)
 {
 	lastTime = timer.getElapsedTime();
 	loadAssets();
-	const sf::Image enemyTexture("assets/enemy.png");
-	enemies.emplace_back(enemyTexture, sf::Vector2f(0, 0));
+	enemyTexture.loadFromFile("assets/enemy.png");
 	gameState.setPlayerReference(&player);
 }
 
 void game::loadAssets()
 {
-	/*const sf::Image platform("assets/platform.png");
-	bool platformresult = platformText.loadFromImage(platform, false, sf::IntRect({ 0, 0 }, { 24, 24 }));
-	sf::Sprite sp_platform(platformText);
-	sp_platform.setPosition({ 200.f, 200.f });
-	platforms.push_back(sp_platform);*/
-
 	const sf::Image platform1("assets/platform1.png");
 	bool platformresult1 = platformText1.loadFromImage(platform1, false, sf::IntRect({ 0, 0 }, { 176, 18 }));
 	sf::Sprite sp_platform1(platformText1);
@@ -50,6 +44,15 @@ void game::loadAssets()
 	platforms.push_back(sp_floor);
 
 	floor = sp_floor;
+
+	//Creating Different Spawn Points
+	spawnPoints.push_back({50.f, 180.f});
+	spawnPoints.push_back({ 440.f, 160.f });
+}
+
+void game::spawnWave(int numEnemies)
+{
+	enemiesToSpawn = numEnemies;
 }
 
 void game::run()
@@ -81,51 +84,63 @@ void game::run()
 					enemy.update(platforms);
 				}
 
-				sf::Vector2f playerPos = player.getPosition();
-				sf::Vector2f playerSize = player.getSize();
-
-				for (auto it = enemies.begin(); it != enemies.end(); )
+				if (enemies.empty() && enemiesToSpawn == 0)
 				{
-					sf::Vector2f enemyPos = it->getPosition();
-					sf::Vector2f enemySize = it->getSize();
-					float enemyMiddleY = enemyPos.y + enemySize.y / 2.f;
+					spawnWave(5);
+				}
 
-
-					bool collisionX = playerPos.x + playerSize.x > enemyPos.x && playerPos.x < enemyPos.x + enemySize.x;
-					bool collisionY = playerPos.y + playerSize.y > enemyPos.y && playerPos.y < enemyPos.y + enemySize.y;
-
-					if (collisionX && collisionY)
+				if (enemiesToSpawn > 0)
+				{
+					if (spawnClock.getElapsedTime().asSeconds() >= spawnSpeed)
 					{
-						if (playerPos.y + playerSize.y >= enemyMiddleY - 10.f && playerPos.y + playerSize.y <= enemyPos.y + enemySize.y)
+						spawnClock.restart();
+						std::cout << "EnemySpawned" << std::endl;
+						sf::Vector2f spawnPos = spawnPoints[rand() % spawnPoints.size()];
+						enemies.emplace_back(enemyTexture, spawnPos);
+						enemiesToSpawn--;
+					}
+				}
+
+				if (player.invincible == false)
+				{
+					//Player and Enemy Collisions checks
+					sf::Vector2f playerPos = player.getPosition();
+					sf::Vector2f playerSize = player.getSize();
+					for (auto it = enemies.begin(); it != enemies.end(); )
+					{
+						sf::Vector2f enemyPos = it->getPosition();
+						sf::Vector2f enemySize = it->getSize();
+
+						bool collisionX = playerPos.x + playerSize.x > enemyPos.x && playerPos.x < enemyPos.x + enemySize.x;
+						bool collisionY = playerPos.y + playerSize.y > enemyPos.y && playerPos.y < enemyPos.y + enemySize.y;
+
+						if (collisionX && collisionY)
 						{
-							std::cout << "Enemy Die " << std::endl;
-							it = enemies.erase(it);
-							continue;
-						}
-						else
-						{
-							std::cout << "Player Die " << std::endl;
-							player.reset();
-							player.loseLife();
-							if (player.getLives() == 0)
+							if (playerPos.y < enemyPos.y)
 							{
-								gameState.setState(GameState::GameOver);
+								std::cout << "Enemy Die " << std::endl;
+								it = enemies.erase(it);
+								continue;
+							}
+							else
+							{
+								std::cout << "Player Die " << std::endl;
+								player.reset();
+								player.loseLife();
+								if (player.getLives() == 0)
+								{
+									gameState.setState(GameState::GameOver);
+								}
 							}
 						}
+						++it;
 					}
-					++it;
 				}
 			}
-
 			gameState.handleInput(window);
-
-			// TODO:
-			// Instead of moving the player straight away, manipulate newposition
-			// check newposition instead of player, use it like a view into a future potential movement.
-			// If it's colliding, discard the newposition and do not move
-			// otherwise, overwrite the globalbounds of the rect with the newposition.		
 		}
 
+		//Drawing depending on the state
 		if (gameState.getState() == GameState::Playing)
 		{
 			window.clear();

@@ -15,6 +15,11 @@ private:
 	bool just_jumped = true;
 	bool isMoving;
 
+	
+	sf::Clock invincibleClock;
+	bool visible = true;
+	float flashSpeed = 0.2f;
+
 	sf::Vector2f velocity;
 	float acceleration = 0.02f;
 	float deceleration = 0.01f;
@@ -44,7 +49,7 @@ public:
 	void updateAnimation();
 
 	sf::Vector2f getPosition() const;
-
+	bool invincible = true;
 	void setPosition(float x, float y);
 
 	int getLives() const { return lives; }

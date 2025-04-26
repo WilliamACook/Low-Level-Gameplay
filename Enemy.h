@@ -6,8 +6,6 @@ enum class flapDirection {None, Up, Down};
 class Enemy
 {
 private:
-	sf::Image image;
-	sf::Texture texture;
 	sf::Sprite sprite;
 	bool onPlatform;
 	sf::Vector2f velocity;
@@ -21,7 +19,7 @@ private:
 	flapDirection currentState = flapDirection::None;
 
 public:
-	Enemy(sf::Image texturesrc, sf::Vector2f position);
+	Enemy(const sf::Texture& texture,sf::Vector2f position);
 
 	void update(const std::vector<sf::Sprite>& platforms);
 	void draw(sf::RenderWindow& window);

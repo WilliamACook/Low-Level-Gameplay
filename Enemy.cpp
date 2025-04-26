@@ -1,10 +1,8 @@
 #include "Enemy.h"
 #include <iostream>
 
-Enemy::Enemy(sf::Image texturesrc, sf::Vector2f position) : texture(), sprite(texture)
+Enemy::Enemy(const sf::Texture& texture,sf::Vector2f position) : sprite(texture), onPlatform(false)
 { 
-	bool result = texture.loadFromImage(texturesrc, false, sf::IntRect({ 0,0 }, { 24,24 }));
-	
 	sf::Sprite enemy(texture);
 	sprite = enemy;
 	sprite.setPosition(position);
@@ -53,7 +51,7 @@ void Enemy::update(const std::vector<sf::Sprite>& platforms)
 		}
 		flapCooldown = static_cast<float>(rand() % 1000) / 1000.f + 0.4f;
 		flapClock.restart();
-		std::cout << "Flap triggered! Next flap in: " << flapCooldown << " seconds." << std::endl;
+		//std::cout << "Flap triggered! Next flap in: " << flapCooldown << " seconds." << std::endl;
 
 		switch (currentState)
 		{
@@ -121,6 +119,7 @@ void Enemy::handleCollision(const std::vector<sf::Sprite>& platforms)
 		{	
 			onPlatform = true;
 			sprite.setPosition(sf::Vector2(enemyPos.x, platformPos.y - enemySize.y));
+			enemyPos = getPosition();
 		}
 
 		//Bottom Side
@@ -130,26 +129,27 @@ void Enemy::handleCollision(const std::vector<sf::Sprite>& platforms)
 			enemyPos.x < platformPos.x + platformSize.size.x)
 		{
 			sprite.setPosition(sf::Vector2(enemyPos.x, platformPos.y + platformSize.size.y));
+			enemyPos = getPosition();
 		}
 
 		//Left Side
-		if (!onPlatform &&
-			enemyPos.x + enemySize.x > platformPos.x &&
+		if (enemyPos.x + enemySize.x > platformPos.x &&
 			enemyPos.x + enemySize.x - 5.f <= platformPos.x &&
 			enemyPos.y + enemySize.y > platformPos.y &&
 			enemyPos.y < platformPos.y + platformSize.size.y)
 		{
 			velocity.x = -velocity.x;
+			enemyPos = getPosition();
 		}
 
 		//Right Side
-		if (!onPlatform &&
-			enemyPos.x < platformPos.x + platformSize.size.x &&
+		if (enemyPos.x < platformPos.x + platformSize.size.x &&
 			enemyPos.x + 5.f > platformPos.x + platformSize.size.x &&
 			enemyPos.y + enemySize.y > platformPos.y &&
 			enemyPos.y < platformPos.y + platformSize.size.y)
 		{
 			velocity.x = -velocity.x;
+			enemyPos = getPosition();
 		}
 	}
 }
