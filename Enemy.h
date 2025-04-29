@@ -18,12 +18,19 @@ private:
 	float topThreshhold = 80.f;
 	flapDirection currentState = flapDirection::None;
 
+	sf::Texture flyingTexture;
+	std::vector<sf::IntRect> flyingFrames;
+	int currentFlyingFrame = 0;
+	sf::Clock animationClock;
+
 public:
 	Enemy(const sf::Texture& texture,sf::Vector2f position);
 
 	void update(const std::vector<sf::Sprite>& platforms);
 	void draw(sf::RenderWindow& window);
 	void bounce();
+	void loadAnimation();
+	void updateAnimation();
 	void handleCollision(const std::vector<sf::Sprite>& platforms);
 	sf::Vector2f getPosition() const;
 	void setPosition(sf::Vector2f pos);

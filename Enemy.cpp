@@ -5,8 +5,10 @@ Enemy::Enemy(const sf::Texture& texture,sf::Vector2f position) : sprite(texture)
 { 
 	sf::Sprite enemy(texture);
 	sprite = enemy;
+	sprite.setTextureRect(sf::IntRect({ 32,0 }, { 32, 28 }));
 	sprite.setPosition(position);
 	velocity.x = 1.f;
+	loadAnimation();
 }
 
 void Enemy::update(const std::vector<sf::Sprite>& platforms)
@@ -56,6 +58,7 @@ void Enemy::update(const std::vector<sf::Sprite>& platforms)
 		switch (currentState)
 		{
 		case flapDirection::Up:
+			//sprite.setTexture(flyingTexture);
 			velocity.y = -strength;
 			break;
 		case flapDirection::Down:
@@ -90,6 +93,7 @@ void Enemy::update(const std::vector<sf::Sprite>& platforms)
 	{
 		setPosition(sf::Vector2f(getPosition().x, 0.f));
 	}
+	updateAnimation();
 }
 
 void Enemy::draw(sf::RenderWindow& window)
@@ -101,10 +105,29 @@ void Enemy::bounce()
 {
 }
 
+void Enemy::loadAnimation()
+{
+	//flyingTexture.loadFromFile("assets/EnemyflyingSpritesheet.png");
+
+	flyingFrames.push_back(sf::IntRect({ 0,0 }, { 32, 28 }));
+	flyingFrames.push_back(sf::IntRect({ 32,0 }, { 32, 28 }));
+}
+
+void Enemy::updateAnimation()
+{
+	float frameTime = 0.2f;
+	if (animationClock.getElapsedTime().asSeconds() > frameTime)
+	{
+		currentFlyingFrame = (currentFlyingFrame + 1) % flyingFrames.size();
+		sprite.setTextureRect(flyingFrames[currentFlyingFrame]);
+		animationClock.restart();
+	}
+}
+
 void Enemy::handleCollision(const std::vector<sf::Sprite>& platforms)
 {
 	sf::Vector2f enemyPos = getPosition();
-	sf::Vector2f enemySize = getSize();
+	sf::Vector2f enemySize(32, 28);
 
 	for (const auto& plat : platforms)
 	{
@@ -139,6 +162,8 @@ void Enemy::handleCollision(const std::vector<sf::Sprite>& platforms)
 			enemyPos.y < platformPos.y + platformSize.size.y)
 		{
 			velocity.x = -velocity.x;
+			sprite.setOrigin(sf::Vector2(sprite.getLocalBounds().size.x, 0.f));
+			sprite.setScale(sf::Vector2f(-1.f, 1.f));
 			enemyPos = getPosition();
 		}
 
@@ -149,6 +174,8 @@ void Enemy::handleCollision(const std::vector<sf::Sprite>& platforms)
 			enemyPos.y < platformPos.y + platformSize.size.y)
 		{
 			velocity.x = -velocity.x;
+			sprite.setOrigin(sf::Vector2(0.f, 0.f));
+			sprite.setScale(sf::Vector2f(1.f, 1.f));
 			enemyPos = getPosition();
 		}
 	}

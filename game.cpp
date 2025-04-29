@@ -6,7 +6,7 @@ platformText1(), platformText2(), platformText3(), platformText4(), floorText(),
 {
 	lastTime = timer.getElapsedTime();
 	loadAssets();
-	enemyTexture.loadFromFile("assets/enemy.png");
+	enemyTexture.loadFromFile("assets/enemyFlyingSpritesheet.png");
 	gameState.setPlayerReference(&player);
 }
 
@@ -46,7 +46,7 @@ void game::loadAssets()
 	floor = sp_floor;
 
 	//Creating Different Spawn Points
-	spawnPoints.push_back({50.f, 180.f});
+	spawnPoints.push_back({50.f, 170.f});
 	spawnPoints.push_back({ 440.f, 160.f });
 }
 
@@ -130,6 +130,8 @@ void game::run()
 								if (player.getLives() == 0)
 								{
 									gameState.setState(GameState::GameOver);
+									enemies.clear();
+									break;
 								}
 							}
 						}
