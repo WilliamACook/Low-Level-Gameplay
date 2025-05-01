@@ -4,6 +4,7 @@
 #include "player.h"
 #include "Enemy.h"
 #include "GameStateManager.h"
+#include "DeathParticle.h"
 
 class game
 {
@@ -18,8 +19,10 @@ private:
 	player player;
 	sf::Image enemyImage;
 	sf::Texture enemyTexture;
+	sf::Texture deathParticleTexture;
 	std::vector<Enemy> enemies;
 	std::vector<sf::Sprite> platforms;
+	std::vector<DeathParticle> deathParticles;
 
 	int currentWave = 1;
 	int enemiesToSpawn = 4;
@@ -27,7 +30,7 @@ private:
 	sf::Clock spawnClock;
 	std::vector<sf::Vector2f> spawnPoints;
 
-	sf::Texture platformText, platformText1, platformText2, platformText3, platformText4, floorText, enemyText;
+	sf::Texture platformText, platformText1, platformText2, platformText3, platformText4, floorText, enemyText, lifeTexture;
 	sf::Sprite floor;
 
 	void loadAssets();

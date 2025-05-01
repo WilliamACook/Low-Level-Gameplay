@@ -43,11 +43,15 @@ void game::loadAssets()
 	sp_floor.setPosition({ 120.f,340.f });
 	platforms.push_back(sp_floor);
 
+	lifeTexture.loadFromFile("assets/life.png");
+	deathParticleTexture.loadFromFile("assets/DeathParticle.png");
+
 	floor = sp_floor;
 
 	//Creating Different Spawn Points
 	spawnPoints.push_back({50.f, 170.f});
 	spawnPoints.push_back({ 440.f, 160.f });
+	spawnPoints.push_back({ 210.f, 60.f });
 }
 
 void game::spawnWave(int numEnemies)
@@ -125,6 +129,7 @@ void game::run()
 							else
 							{
 								std::cout << "Player Die " << std::endl;
+								deathParticles.emplace_back(deathParticleTexture, playerPos);
 								player.reset();
 								player.loseLife();
 								if (player.getLives() == 0)
@@ -137,6 +142,18 @@ void game::run()
 						}
 						++it;
 					}
+				}
+			}
+
+			for (auto it = deathParticles.begin(); it != deathParticles.end();)
+			{
+				if (!it->update())
+				{
+					it = deathParticles.erase(it);
+				}
+				else
+				{
+					++it;
 				}
 			}
 			gameState.handleInput(window);
@@ -156,6 +173,18 @@ void game::run()
 			for (auto& platform : platforms)
 			{
 				window.draw(platform);
+			}
+
+			for (auto particle : deathParticles)
+			{
+				particle.draw(window);
+			}
+
+			for (int i = 0; i < player.getLives(); i++)
+			{
+				sf::Sprite lifeSprite(lifeTexture);
+				lifeSprite.setPosition(sf::Vector2f(220.f + i * (lifeSprite.getGlobalBounds().size.x + 5.f), 352.f));
+				window.draw(lifeSprite);
 			}
 			player.draw(window);
 			window.display();

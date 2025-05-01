@@ -144,14 +144,15 @@ void GameStateManager::draw(sf::RenderWindow& window)
 		window.draw(exitButton);
 	}
 
-	if (currentState == GameState::Playing)
-	{
-		window.clear();
-		lives.setFont(font);
-		lives.setString("Lives: " + std::to_string(playerRef->getLives()));
-		lives.setPosition(sf::Vector2f(20.f, 20.f));
-		window.draw(lives);
-	}
+	//Moved this to game cpp with new sprites instead of text
+	//if (currentState == GameState::Playing)
+	//{
+	//	window.clear();
+	//	lives.setFont(font);
+	//	lives.setString("Lives: " + std::to_string(playerRef->getLives()));
+	//	lives.setPosition(sf::Vector2f(20.f, 20.f));
+	//	window.draw(lives);
+	//}
 	
 }
 
