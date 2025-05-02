@@ -6,7 +6,6 @@ platformText1(), platformText2(), platformText3(), platformText4(), floorText(),
 {
 	lastTime = timer.getElapsedTime();
 	loadAssets();
-	enemyTexture.loadFromFile("assets/enemyFlyingSpritesheet.png");
 	gameState.setPlayerReference(&player);
 }
 
@@ -43,8 +42,10 @@ void game::loadAssets()
 	sp_floor.setPosition({ 120.f,340.f });
 	platforms.push_back(sp_floor);
 
+	enemyTexture.loadFromFile("assets/enemyFlyingSpritesheet.png");
 	lifeTexture.loadFromFile("assets/life.png");
 	deathParticleTexture.loadFromFile("assets/DeathParticle.png");
+	eggTexture.loadFromFile("assets/egg.png");
 
 	floor = sp_floor;
 
@@ -88,6 +89,12 @@ void game::run()
 					enemy.update(platforms);
 				}
 
+				for (auto& egg : eggs)
+				{
+					egg.handleCollision(platforms);
+					egg.update();
+				}
+
 				if (enemies.empty() && enemiesToSpawn == 0)
 				{
 					spawnWave(5);
@@ -110,10 +117,10 @@ void game::run()
 					//Player and Enemy Collisions checks
 					sf::Vector2f playerPos = player.getPosition();
 					sf::Vector2f playerSize = player.getSize();
-					for (auto it = enemies.begin(); it != enemies.end(); )
+					for (auto i = enemies.begin(); i != enemies.end(); )
 					{
-						sf::Vector2f enemyPos = it->getPosition();
-						sf::Vector2f enemySize = it->getSize();
+						sf::Vector2f enemyPos = i->getPosition();
+						sf::Vector2f enemySize = i->getSize();
 
 						bool collisionX = playerPos.x + playerSize.x > enemyPos.x && playerPos.x < enemyPos.x + enemySize.x;
 						bool collisionY = playerPos.y + playerSize.y > enemyPos.y && playerPos.y < enemyPos.y + enemySize.y;
@@ -123,7 +130,8 @@ void game::run()
 							if (playerPos.y < enemyPos.y)
 							{
 								std::cout << "Enemy Die " << std::endl;
-								it = enemies.erase(it);
+								eggs.emplace_back(eggTexture, enemyPos);
+								i = enemies.erase(i);
 								continue;
 							}
 							else
@@ -140,20 +148,27 @@ void game::run()
 								}
 							}
 						}
-						++it;
+						++i;
 					}
 				}
 			}
-
-			for (auto it = deathParticles.begin(); it != deathParticles.end();)
+		/*	for (auto i = eggs.begin(); i != eggs.end(); )
 			{
-				if (!it->update())
+				if(player.getBounds().findIntersection(i->getBounds()))
 				{
-					it = deathParticles.erase(it);
+					i = eggs.erase(i);
+				}
+			}*/
+
+			for (auto i = deathParticles.begin(); i != deathParticles.end(); )
+			{
+				if (!i->update())
+				{
+					i = deathParticles.erase(i);
 				}
 				else
 				{
-					++it;
+					++i;
 				}
 			}
 			gameState.handleInput(window);
@@ -178,6 +193,11 @@ void game::run()
 			for (auto particle : deathParticles)
 			{
 				particle.draw(window);
+			}
+
+			for (auto& egg : eggs)
+			{
+				egg.draw(window);
 			}
 
 			for (int i = 0; i < player.getLives(); i++)

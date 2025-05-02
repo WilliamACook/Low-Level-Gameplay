@@ -14,7 +14,6 @@ private:
 	bool onPlatform;
 	bool just_jumped = true;
 	bool isMoving;
-
 	
 	sf::Clock invincibleClock;
 	bool visible = true;
@@ -58,6 +57,7 @@ public:
 
 	void handleCollision(const std::vector<sf::Sprite>& platform);
 	sf::Vector2f getSize() const;
+	sf::FloatRect getBounds() { return sprite.getGlobalBounds(); }
 	void reset();
 };
 

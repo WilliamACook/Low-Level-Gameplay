@@ -2,7 +2,7 @@
 #include <iostream>
 #include "player.h"
 
-GameStateManager::GameStateManager() : title(font), playButton(font), optionsButton(font), exitButton(font), paused(font), lives(font), sp_Logo(logoText), sp_PlayButton(buttonOffText), sp_QuitButton(buttonOffText)
+GameStateManager::GameStateManager() : title(font), playButtonText(font), optionsButton(font), exitButtonText(font), paused(font), lives(font), sp_Logo(logoText), sp_PlayButton(buttonOffText), sp_QuitButton(buttonOffText)
 {
 	if (!font.openFromFile("assets/Roboto.ttf"))
 		std::cout << "Failed to load font!" << std::endl;
@@ -15,20 +15,19 @@ GameStateManager::GameStateManager() : title(font), playButton(font), optionsBut
 	title.setCharacterSize(50);
 	title.setPosition(sf::Vector2f(125.f, 50.f));
 
-	playButton.setFont(font);
-	playButton.setString("Play");
-	playButton.setCharacterSize(30);
-	playButton.setOutlineColor(sf::Color::Black);
-	playButton.setOutlineThickness(2.f);
-	playButton.setPosition(sf::Vector2f(236.f, 155.f));
+	playButtonText.setFont(font);
+	playButtonText.setString("Play");
+	playButtonText.setCharacterSize(30);
+	playButtonText.setOutlineColor(sf::Color::Black);
+	playButtonText.setOutlineThickness(2.f);
+	playButtonText.setPosition(sf::Vector2f(236.f, 155.f));
 	
-
-	exitButton.setFont(font);
-	exitButton.setString("Quit");
-	exitButton.setCharacterSize(30);
-	exitButton.setOutlineColor(sf::Color::Black);
-	exitButton.setOutlineThickness(2.f);
-	exitButton.setPosition(sf::Vector2f(236.f, 250.f));
+	exitButtonText.setFont(font);
+	exitButtonText.setString("Quit");
+	exitButtonText.setCharacterSize(30);
+	exitButtonText.setOutlineColor(sf::Color::Black);
+	exitButtonText.setOutlineThickness(2.f);
+	exitButtonText.setPosition(sf::Vector2f(236.f, 250.f));
 
 	paused.setFont(titleFont);
 	paused.setString("Paused");
@@ -114,34 +113,34 @@ void GameStateManager::draw(sf::RenderWindow& window)
 	{
 		window.draw(sp_Logo);
 		window.draw(sp_PlayButton);
-		window.draw(playButton);
+		window.draw(playButtonText);
 		window.draw(sp_QuitButton);
-		window.draw(exitButton);
+		window.draw(exitButtonText);
 	}
 
 	if (currentState == GameState::Paused)
 	{
-		playButton.setString("Resume");
-		playButton.setPosition(sf::Vector2f(211.f, 155.f));
+		playButtonText.setString("Resume");
+		playButtonText.setPosition(sf::Vector2f(211.f, 155.f));
 		window.draw(paused);
 		window.draw(sp_PlayButton);
 		window.draw(sp_QuitButton);
-		window.draw(playButton);
-		window.draw(exitButton);
+		window.draw(playButtonText);
+		window.draw(exitButtonText);
 	}
 
 	if (currentState == GameState::GameOver)
 	{
 		window.clear();
-		playButton.setString("Restart");
-		playButton.setPosition(sf::Vector2f(216.f, 155.f));
+		playButtonText.setString("Restart");
+		playButtonText.setPosition(sf::Vector2f(216.f, 155.f));
 		title.setString("Game Over");
 		title.setPosition(sf::Vector2f(126.f, 50.f));
 		window.draw(title);
 		window.draw(sp_PlayButton);
-		window.draw(playButton);
+		window.draw(playButtonText);
 		window.draw(sp_QuitButton);
-		window.draw(exitButton);
+		window.draw(exitButtonText);
 	}
 
 	//Moved this to game cpp with new sprites instead of text

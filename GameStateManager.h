@@ -11,7 +11,7 @@ private:
 	GameState currentState;
 	sf::Font font;
 	sf::Font titleFont;
-	sf::Text title, playButton, optionsButton, exitButton, paused, lives;
+	sf::Text title, playButtonText, optionsButton, exitButtonText, paused, lives;
 	player* playerRef = nullptr;
 	sf::Texture logoText;
 	sf::Sprite sp_Logo;
