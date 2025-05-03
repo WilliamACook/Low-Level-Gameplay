@@ -2,7 +2,7 @@
 #include <iostream>
 
 game::game() : window(sf::VideoMode({533, 400}), "Joust"), timeStep(6), player(235.f, 300.f, sf::Image("assets/idle.png")), platformText(), 
-platformText1(), platformText2(), platformText3(), platformText4(), floorText(), floor(floorText)
+platformText1(), platformText2(), platformText3(), platformText4(), floorText(), floor(floorText), scoreText(font)
 {
 	lastTime = timer.getElapsedTime();
 	loadAssets();
@@ -42,10 +42,24 @@ void game::loadAssets()
 	sp_floor.setPosition({ 120.f,340.f });
 	platforms.push_back(sp_floor);
 
-	enemyTexture.loadFromFile("assets/enemyFlyingSpritesheet.png");
-	lifeTexture.loadFromFile("assets/life.png");
-	deathParticleTexture.loadFromFile("assets/DeathParticle.png");
-	eggTexture.loadFromFile("assets/egg.png");
+	if(!enemyTexture.loadFromFile("assets/enemyFlyingSpritesheet.png"))
+		std::cout << "Failed to load enemyTexture!" << std::endl;
+	if(!lifeTexture.loadFromFile("assets/life.png"))
+		std::cout << "Failed to load lifeTexture!" << std::endl;
+	if(!deathParticleTexture.loadFromFile("assets/DeathParticle.png"))
+		std::cout << "Failed to load DeathParticle!" << std::endl;
+	if(!eggTexture.loadFromFile("assets/egg.png"))
+		std::cout << "Failed to load eggTexture!" << std::endl;
+
+	if (!font.openFromFile("assets/Roboto.ttf"))
+		std::cout << "Failed to load font!" << std::endl;
+
+	scoreText.setFont(font);
+	scoreText.setString("0");
+	scoreText.setCharacterSize(15);
+	scoreText.setOutlineColor(sf::Color::Black);
+	scoreText.setOutlineThickness(1.f);
+	scoreText.setPosition(sf::Vector2f(155.f, 350.f));
 
 	floor = sp_floor;
 
@@ -84,7 +98,7 @@ void game::run()
 			if (gameState.getState() == GameState::Playing)
 			{
 				player.update(window, platforms);
-				for (auto& enemy : enemies)
+				for (auto& enemy : activeEnemies)
 				{
 					enemy.update(platforms);
 				}
@@ -95,7 +109,7 @@ void game::run()
 					egg.update();
 				}
 
-				if (enemies.empty() && enemiesToSpawn == 0)
+				if (activeEnemies.empty() && enemiesToSpawn == 0)
 				{
 					spawnWave(5);
 				}
@@ -107,7 +121,17 @@ void game::run()
 						spawnClock.restart();
 						std::cout << "EnemySpawned" << std::endl;
 						sf::Vector2f spawnPos = spawnPoints[rand() % spawnPoints.size()];
-						enemies.emplace_back(enemyTexture, spawnPos);
+						if (!inactiveEnemies.empty())
+						{
+							Enemy enemy = inactiveEnemies.back();
+							inactiveEnemies.pop_back();
+							enemy.setPosition(spawnPos);
+							activeEnemies.push_back(enemy);
+						}
+						else
+						{
+							activeEnemies.emplace_back(enemyTexture, spawnPos);
+						}
 						enemiesToSpawn--;
 					}
 				}
@@ -117,7 +141,7 @@ void game::run()
 					//Player and Enemy Collisions checks
 					sf::Vector2f playerPos = player.getPosition();
 					sf::Vector2f playerSize = player.getSize();
-					for (auto i = enemies.begin(); i != enemies.end(); )
+					for (auto i = activeEnemies.begin(); i != activeEnemies.end(); )
 					{
 						sf::Vector2f enemyPos = i->getPosition();
 						sf::Vector2f enemySize = i->getSize();
@@ -131,7 +155,8 @@ void game::run()
 							{
 								std::cout << "Enemy Die " << std::endl;
 								eggs.emplace_back(eggTexture, enemyPos);
-								i = enemies.erase(i);
+								inactiveEnemies.push_back(*i);
+								i = activeEnemies.erase(i);
 								continue;
 							}
 							else
@@ -143,7 +168,14 @@ void game::run()
 								if (player.getLives() == 0)
 								{
 									gameState.setState(GameState::GameOver);
-									enemies.clear();
+									for (auto& enemy : activeEnemies)
+									{
+										inactiveEnemies.push_back(enemy);
+									}
+									activeEnemies.clear();
+									eggs.clear();
+									gameScore = 0;
+									scoreText.setString(std::to_string(gameScore));
 									break;
 								}
 							}
@@ -152,13 +184,19 @@ void game::run()
 					}
 				}
 			}
-		/*	for (auto i = eggs.begin(); i != eggs.end(); )
+			for (auto i = eggs.begin(); i != eggs.end(); )
 			{
 				if(player.getBounds().findIntersection(i->getBounds()))
 				{
+					addScore(500);
+					scoreText.setString(std::to_string(gameScore));
 					i = eggs.erase(i);
 				}
-			}*/
+				else
+				{
+					++i;
+				}
+			}
 
 			for (auto i = deathParticles.begin(); i != deathParticles.end(); )
 			{
@@ -180,7 +218,7 @@ void game::run()
 			window.clear();
 			gameState.draw(window);
 			//window.draw(sp_enemy);
-			for (auto& enemy : enemies)
+			for (auto& enemy : activeEnemies)
 			{
 				enemy.draw(window);
 			}
@@ -190,7 +228,7 @@ void game::run()
 				window.draw(platform);
 			}
 
-			for (auto particle : deathParticles)
+			for (auto& particle : deathParticles)
 			{
 				particle.draw(window);
 			}
@@ -207,12 +245,13 @@ void game::run()
 				window.draw(lifeSprite);
 			}
 			player.draw(window);
+			window.draw(scoreText);
 			window.display();
 		}
 		else if (gameState.getState() == GameState::Paused)
 		{
 			window.clear();
-			for (auto& enemy : enemies)
+			for (auto& enemy : activeEnemies)
 			{
 				enemy.draw(window);
 			}

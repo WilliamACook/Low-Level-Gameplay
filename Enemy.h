@@ -12,7 +12,7 @@ private:
 
 	sf::Clock flapClock;
 	float flapCooldown = 0.f;
-	float strength = 0.2;
+	float strength = 0.2f;
 	float bottomThreshhold = 320.f;
 	float middleThreshhold = 200.f;
 	float topThreshhold = 80.f;

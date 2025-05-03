@@ -21,10 +21,15 @@ private:
 	sf::Image enemyImage;
 	sf::Texture enemyTexture;
 	sf::Texture deathParticleTexture;
-	std::vector<Enemy> enemies;
+	std::vector<Enemy> activeEnemies;
+	std::vector<Enemy> inactiveEnemies;
 	std::vector<sf::Sprite> platforms;
 	std::vector<DeathParticle> deathParticles;
 	std::vector<Pickup> eggs;
+
+	int gameScore = 0;
+	sf::Font font;
+	sf::Text scoreText;
 
 	int currentWave = 1;
 	int enemiesToSpawn = 4;
@@ -34,9 +39,11 @@ private:
 
 	sf::Texture platformText, platformText1, platformText2, platformText3, platformText4, floorText, enemyText, lifeTexture, eggTexture;
 	sf::Sprite floor;
+	
 
 	void loadAssets();
 	void spawnWave(int numEnemies);
+	void addScore(int points) { gameScore += points; }
 
 public:
 	game();
