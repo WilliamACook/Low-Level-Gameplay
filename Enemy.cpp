@@ -11,11 +11,11 @@ Enemy::Enemy(const sf::Texture& texture,sf::Vector2f position) : sprite(texture)
 	loadAnimation();
 }
 
-void Enemy::update(const std::vector<sf::Sprite>& platforms)
+void Enemy::update(const std::vector<sf::Sprite>& platforms, player* p)
 {
 	onPlatform = false;
 	sf::Vector2f enemyPos = getPosition();
-
+	playerRef = p;
 	//Wrap screen
 	if (enemyPos.x > 533.f) { enemyPos.x = -sprite.getGlobalBounds().size.length(); }
 	else if (enemyPos.x + sprite.getGlobalBounds().size.length() < 0.f) {enemyPos.x = 533.f ; }
@@ -39,9 +39,16 @@ void Enemy::update(const std::vector<sf::Sprite>& platforms)
 		{
 			if (roll < 50)
 			{
+				if (playerRef->getPosition().y < enemyPos.y)
+					currentState = flapDirection::Up;
+				if (playerRef->getPosition().y > enemyPos.y)
+					currentState = flapDirection::Down;
+			}
+			else if (roll < 75)
+			{
 				currentState = flapDirection::Up;
 			}
-			else if (roll > 50)
+			else if (roll > 75)
 			{
 				currentState = flapDirection::Down;
 			}

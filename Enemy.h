@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include "player.h"
 
 enum class flapDirection {None, Up, Down};
 
@@ -17,6 +18,7 @@ private:
 	float middleThreshhold = 200.f;
 	float topThreshhold = 80.f;
 	flapDirection currentState = flapDirection::None;
+	player* playerRef = nullptr;
 
 	sf::Texture flyingTexture;
 	std::vector<sf::IntRect> flyingFrames;
@@ -26,7 +28,7 @@ private:
 public:
 	Enemy(const sf::Texture& texture,sf::Vector2f position);
 
-	void update(const std::vector<sf::Sprite>& platforms);
+	void update(const std::vector<sf::Sprite>& platforms, player* p);
 	void draw(sf::RenderWindow& window);
 	void bounce();
 	void loadAnimation();

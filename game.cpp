@@ -100,7 +100,7 @@ void game::run()
 				player.update(window, platforms);
 				for (auto& enemy : activeEnemies)
 				{
-					enemy.update(platforms);
+					enemy.update(platforms, &player);
 				}
 
 				for (auto& egg : eggs)
